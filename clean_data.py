@@ -110,6 +110,15 @@ def load_nndss(raw: Path | None) -> pd.DataFrame:
     return df
 
 
+def national_totals(df: pd.DataFrame) -> pd.Series:
+    """CDC's own 'U.S. residents' cumulative total at the last week of each year (for checks)."""
+    us = df[df["label"].isin(MEASLES_LABELS)
+            & df["states"].str.strip().str.upper().isin(["US RESIDENTS", "U.S. RESIDENTS"])].copy()
+    us["year"], us["week"], us["m3"] = us["year"].astype(int), us["week"].astype(int), to_num(us["m3"]).fillna(0)
+    us = us[us["week"] == us.groupby("year")["week"].transform("max")]
+    return us.groupby("year")["m3"].sum().astype(int)
+
+
 def clean_cases(df: pd.DataFrame) -> pd.DataFrame:
     df = df[df["label"].isin(MEASLES_LABELS)].copy()
     df["state"] = df["states"].str.strip().str.upper().map(NNDSS_TO_STATE)
@@ -183,14 +192,16 @@ def clean_vax(v: pd.DataFrame) -> pd.DataFrame:
     mmr = v[v["vaccine"] == "MMR"][keys + ["pct"]].rename(columns={"pct": "mmr_coverage"})
     exm = (v[(v["vaccine"] == "Exemption") & (v["dose"] == "Any Exemption")][keys + ["pct"]]
            .rename(columns={"pct": "exemption_rate"}))
-    out = mmr.merge(exm, on=keys, how="outer").rename(
+    out = mmr.merge(exm, on=keys, how="outer", validate="one_to_one").rename(
         columns={"geography": "state", "year_season": "school_year"})
     out = out[out["school_year"].isin([school_year_for(y) for y in CASE_YEARS])]
     # every state x school year, blank where the state did not report
     grid = pd.MultiIndex.from_product(
         [STATES, [school_year_for(y) for y in CASE_YEARS]],
         names=["state", "school_year"]).to_frame(index=False)
-    return grid.merge(out, on=["state", "school_year"], how="left")
+    # Note: SchoolVaxView's "New York" and "Texas" rows are statewide (they include the
+    # separately listed "NY-City of New York" and "TX-City of Houston"), so we use them as is.
+    return grid.merge(out, on=["state", "school_year"], how="left", validate="one_to_one")
 
 
 # --- 4. merge (same steps as the analysis plan) ---------------------------------
@@ -200,10 +211,11 @@ def merge(cases: pd.DataFrame, pop: pd.DataFrame, vax: pd.DataFrame) -> pd.DataF
         cases=("cases", "sum"), through_week=("week", "max"))
     # 2. add population (2026 borrows 2025)
     df["pop_year"] = df["year"].clip(upper=pop["year"].max())
-    df = df.merge(pop.rename(columns={"year": "pop_year"}), on=["state", "pop_year"], how="left")
+    df = df.merge(pop.rename(columns={"year": "pop_year"}), on=["state", "pop_year"],
+                  how="left", validate="many_to_one")  # fails loudly on duplicate keys
     # 3. add the matching school year: 2025 -> "2024-25"
     df["school_year"] = df["year"].map(school_year_for)
-    df = df.merge(vax, on=["state", "school_year"], how="left")
+    df = df.merge(vax, on=["state", "school_year"], how="left", validate="one_to_one")
     # 4. the rate and the 95% flag (blank when coverage was not reported)
     df["rate_per_100k"] = (df["cases"] / df["population"] * 100_000).round(3)
     df["below_95"] = (df["mmr_coverage"] < 95).astype("Int64").mask(df["mmr_coverage"].isna())
@@ -217,7 +229,9 @@ def main() -> None:
     DATA.mkdir(exist_ok=True)
 
     print("Measles cases (CDC NNDSS)")
-    cases = clean_cases(load_nndss(raw))
+    nndss = load_nndss(raw)
+    cases = clean_cases(nndss)
+    us_total = national_totals(nndss)
     print("Population (Census NST-EST2025)")
     pop = clean_population(load_population(raw))
     print("MMR coverage & exemptions (CDC SchoolVaxView)")
@@ -236,8 +250,11 @@ def main() -> None:
           f"{table['population'].isna().sum()}, blank coverage: {table['mmr_coverage'].isna().sum()}"
           f"  {'[OK]' if ok else '[CHECK]'}")
     for y, g in table.groupby("year"):
+        match = us_total.get(y)
+        flag = "" if match is None else ("  = CDC U.S. total [OK]" if match == g["cases"].sum()
+                                         else f"  vs CDC U.S. total {match:,} [CHECK]")
         print(f"  {y}: {g['cases'].sum():>5,} cases through MMWR week {g['through_week'].max()}, "
-              f"{(g['cases'] > 0).sum()} states with cases")
+              f"{(g['cases'] > 0).sum()} states with cases{flag}")
     missing = table[table["mmr_coverage"].isna()][["state", "school_year"]]
     if len(missing):
         print("  coverage not reported:", "; ".join(f"{s} {y}" for s, y in missing.values))

@@ -16,7 +16,88 @@ TARGET = 95.0
 # Colors (validated categorical order; status colors reserved for target flags)
 YEAR_COLORS = {2024: "#2a78d6", 2025: "#eb6834", 2026: "#1baf7a"}
 BELOW, AT = "#d03b3b", "#0ca30c"
-BLUES = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
+BLUES = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]  # vaccination
+REDS = ["#fbe4e2", "#f5bcb6", "#ec9087", "#de6157", "#c62e3a", "#991f2a", "#66141c"]   # disease
+
+# Theme: "public health bulletin". Measles red = disease, blue = protection.
+CSS = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap');
+html, body, [class*="css"], .stMarkdown, .stText { font-family: 'Inter', sans-serif; }
+h1, h2, h3, .hero h1, .card h4, .abstract h3 { font-family: 'Fraunces', Georgia, serif !important; letter-spacing: -0.01em; }
+.block-container { padding-top: 1.6rem; max-width: 1280px; }
+
+/* hero banner */
+.hero { background: linear-gradient(120deg, #1E2633 0%, #3a1f2b 55%, #C62E3A 120%);
+        color: #fff; border-radius: 18px; padding: 30px 34px 26px; margin-bottom: 14px;
+        position: relative; overflow: hidden; }
+.hero:after { content: ""; position: absolute; right: -60px; top: -60px; width: 260px; height: 260px;
+        border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.14) 0 2px, transparent 3px) 0 0/18px 18px; }
+.hero .kicker { text-transform: uppercase; letter-spacing: .16em; font-size: .74rem; opacity: .8; font-weight: 600; }
+.hero h1 { color: #fff; font-size: 2.6rem; margin: .2rem 0 .3rem; font-weight: 800; line-height: 1.08; }
+.hero p { color: rgba(255,255,255,.88); font-size: 1.05rem; max-width: 820px; margin: 0; }
+.hero .pill { display: inline-block; margin-top: 14px; margin-right: 8px; padding: 4px 12px; border-radius: 999px;
+        background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); font-size: .82rem; }
+.hero .pill b { color: #ffd2cc; }
+
+/* metric cards */
+[data-testid="stMetric"] { background: #fff; border: 1px solid #ebe3d7; border-left: 4px solid #C62E3A;
+        border-radius: 12px; padding: 14px 16px 10px; box-shadow: 0 1px 2px rgba(30,38,51,.04); }
+[data-testid="stMetricLabel"] p { font-weight: 600; color: #5b6170; }
+
+/* tabs */
+.stTabs [data-baseweb="tab-list"] { gap: 4px; border-bottom: 1px solid #e6ddcf; }
+.stTabs [data-baseweb="tab"] { font-weight: 600; padding: 8px 14px; border-radius: 10px 10px 0 0; }
+.stTabs [aria-selected="true"] { background: #fff; }
+
+/* content cards */
+.card { background: #fff; border: 1px solid #ebe3d7; border-radius: 14px; padding: 18px 20px; height: 100%;
+        box-shadow: 0 1px 2px rgba(30,38,51,.04); }
+.card h4 { margin: .1rem 0 .4rem; font-size: 1.15rem; color: #1E2633; }
+.card p, .card li { color: #3b4150; font-size: .95rem; line-height: 1.5; }
+.card .tag { font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 700; color: #C62E3A; }
+.card .big { font-family: 'Fraunces', Georgia, serif; font-size: 2.3rem; font-weight: 800; color: #C62E3A; line-height: 1; margin: .3rem 0 .4rem; }
+.card.blue { border-top: 4px solid #256abf; } .card.blue .tag, .card.blue .big { color: #256abf; }
+.card.red { border-top: 4px solid #C62E3A; }
+.aim { background: #fff; border: 1px solid #ebe3d7; border-radius: 14px; padding: 18px 22px; margin: 6px 0 16px; }
+.aim ol { margin: .3rem 0 0 1.1rem; padding: 0; } .aim li { margin: .2rem 0; color: #3b4150; }
+.aim .tag { font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 700; color: #C62E3A; }
+
+/* abstract */
+.abstract { background: #fff; border: 1px solid #ebe3d7; border-radius: 14px; padding: 26px 30px; }
+.abstract h3 { margin-top: 0; font-size: 1.6rem; }
+.abstract .meta { color: #7a7f8c; font-size: .85rem; margin-bottom: 14px; }
+.abstract p { margin: .5rem 0; line-height: 1.6; color: #2b3140; }
+.abstract b.h { color: #C62E3A; text-transform: uppercase; font-size: .78rem; letter-spacing: .12em; margin-right: 6px; }
+.abstract .kw { margin-top: 14px; font-size: .85rem; color: #5b6170; }
+
+/* news articles */
+a.article { display: block; text-decoration: none !important; background: #fff; border: 1px solid #ebe3d7;
+        border-radius: 14px; padding: 16px 18px; height: 100%; transition: transform .15s, box-shadow .15s; }
+a.article:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(30,38,51,.10); }
+a.article .src { font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 700; color: #C62E3A; }
+a.article span { display: block; }
+a.article .h5 { font-family: 'Fraunces', Georgia, serif; color: #1E2633; font-size: 1.05rem; font-weight: 600; margin: .35rem 0; line-height: 1.3; }
+a.article .p { color: #4a5060; font-size: .88rem; margin: 0; line-height: 1.45; }
+a.article .date { color: #C62E3A; font-size: .8rem; font-weight: 600; margin-top: 10px; }
+sup a.cite { color: #C62E3A; text-decoration: none; font-weight: 600; font-size: .78em; }
+.refs { background: #fff; border: 1px solid #ebe3d7; border-radius: 14px; padding: 20px 26px; margin-top: 18px; }
+.refs h3 { margin-top: 0; font-size: 1.3rem; }
+.refs ol { padding-left: 1.3rem; margin: 0; } .refs li { margin: .45rem 0; font-size: .88rem; color: #2b3140;
+        line-height: 1.5; padding-left: 1.4rem; text-indent: -1.4rem; list-style-position: inside; }
+.refs li a { color: #256abf; word-break: break-all; }
+.author { background: #1E2633; color: #fff; border-radius: 14px; padding: 20px 24px; margin-top: 18px; }
+.author .tag { font-size: .72rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 700; color: #ffb3ab; }
+.author .name { font-family: 'Fraunces', Georgia, serif; font-size: 1.45rem; font-weight: 700; margin: .25rem 0 .1rem; }
+.author .detail { color: rgba(255,255,255,.82); font-size: .95rem; }
+.author .links { margin-top: 10px; font-size: .95rem; }
+.author .links a { color: #fff; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.author .links a:hover { color: #ffb3ab; }
+.author.compact { padding: 14px 16px; margin-top: 6px; }
+.author.compact .name { font-size: 1.1rem; } .author.compact .detail, .author.compact .links { font-size: .82rem; }
+.howcite { margin-top: 14px; font-size: .86rem; color: #3b4150; background: #F2ECE3; border-radius: 10px; padding: 10px 14px; }
+</style>
+"""
 
 ABBR = {
     "Alabama": "AL", "Alaska": "AK", "Arizona": "AZ", "Arkansas": "AR", "California": "CA",
@@ -33,7 +114,66 @@ ABBR = {
     "West Virginia": "WV", "Wisconsin": "WI", "Wyoming": "WY",
 }
 
+# ---------------------------------------------------------------- references (APA 7)
+# Numbered in order of first citation in the abstract. cite(1, 2) -> superscript [1,2].
+REFS = [
+    ("Seither, R., Yusuf, O. B., Dramann, D., Calhoun, K., Mugerwa-Kasujja, A., Knighton, C. L., "
+     "Kriss, J. L., Miller, R., &amp; Peacock, G. (2024). Coverage with selected vaccines and exemption "
+     "rates among children in kindergarten — United States, 2023–24 school year. <i>Morbidity and "
+     "Mortality Weekly Report, 73</i>(41), 925–932.", "https://doi.org/10.15585/mmwr.mm7341a3"),
+    ("Willens, V. (2026, July 22). <i>2026 U.S. measles cases surpass 2025 level, highest since declared "
+     "eliminated in 2000</i>. International Vaccine Access Center, Johns Hopkins Bloomberg School of "
+     "Public Health.", "https://publichealth.jhu.edu/ivac/2026-us-measles-cases-surpass-2025-level"),
+    ("Center for Children and Families. (2026, August 25). <i>New CDC data shows increase in vaccine "
+     "exemptions and less vaccine coverage nationally</i>. Georgetown University.",
+     "https://ccf.georgetown.edu/2026/08/25/new-cdc-data-shows-increase-in-vaccine-exemptions-and-less-vaccine-coverage-nationally/"),
+    ("Haelle, T. (2026, September 2). <i>SchoolVaxView offers data and trends on kindergarten vaccination "
+     "rates</i>. Association of Health Care Journalists.",
+     "https://healthjournalism.org/blog/2026/09/schoolvaxview-offers-data-and-trends-on-kindergarten-vaccination-rates"),
+    ("Centers for Disease Control and Prevention. (2026). <i>NNDSS weekly data</i> [Data set]. "
+     "Retrieved October 20, 2026.", "https://data.cdc.gov/d/x9gk-5huc"),
+    ("Centers for Disease Control and Prevention. (2026). <i>Vaccination coverage and exemptions among "
+     "kindergartners</i> [Data set]. SchoolVaxView. Retrieved October 20, 2026.",
+     "https://data.cdc.gov/d/ijqb-a7ye"),
+    ("U.S. Census Bureau. (2026). <i>State population totals and components of change: 2020–2025</i> "
+     "(Vintage 2025, NST-EST2025-ALLDATA) [Data set].",
+     "https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html"),
+    ("Centers for Disease Control and Prevention. (2026, October 16). <i>Measles cases and outbreaks</i>.",
+     "https://www.cdc.gov/measles/data-research/index.html"),
+]
+
+
+AUTHOR = {
+    "name": "Saloni Patil, MPH, BDS",
+    "detail": "MPH in Epidemiology &amp; Biostatistics, Boston University School of Public Health",
+    "links": [("LinkedIn", "https://www.linkedin.com/in/salonipatil11/"),
+              ("Portfolio", "https://salonipatil.com/"),
+              ("Research", "https://salonipatil.com/research")],
+}
+
+
+def author_html(compact: bool = False) -> str:
+    links = " · ".join(f'<a href="{u}" target="_blank" rel="noopener">{t}</a>' for t, u in AUTHOR["links"])
+    cls = "author compact" if compact else "author"
+    return (f'<div class="{cls}"><span class="tag">Author</span>'
+            f'<div class="name">{AUTHOR["name"]}</div><div class="detail">{AUTHOR["detail"]}</div>'
+            f'<div class="links">{links}</div></div>')
+
+
+def cite(*nums: int) -> str:
+    """In-text citation as a superscript linking to the reference list."""
+    links = ",".join(f'<a href="#ref-{n}" class="cite">{n}</a>' for n in nums)
+    return f"<sup>[{links}]</sup>"
+
+
+def references_html() -> str:
+    items = "".join(f'<li id="ref-{i}">{text} <a href="{url}" target="_blank" rel="noopener">{url}</a></li>'
+                    for i, (text, url) in enumerate(REFS, 1))
+    return f'<div class="refs"><h3>References</h3><ol>{items}</ol></div>'
+
+
 st.set_page_config(page_title="Measles Watch USA", page_icon="🦠", layout="wide")
+st.markdown(CSS, unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------------- data
@@ -112,20 +252,50 @@ with st.sidebar:
                f"(week ending {LAST_DATE:%b %d, %Y}).  \n"
                "Coverage: CDC SchoolVaxView, matched kindergarten school year.  \n"
                "Population: Census Vintage 2025.")
+    st.markdown(author_html(compact=True), unsafe_allow_html=True)
 
 yr = table[table["year"] == year].copy()
 school_year = yr["school_year"].iloc[0]
 mcol, mtitle, mfmt = (("rate_per_100k", "Cases per 100k", ".2f") if measure.startswith("Rate")
                       else ("cases", "Cases", ",d"))
 
-st.title("Measles Watch USA")
-st.markdown("**Across U.S. states, is lower kindergarten MMR vaccination coverage linked to "
-            "higher measles incidence, 2024 to 2026?**")
+latest_total = int(table.loc[table["year"] == YEARS[-1], "cases"].sum())
+prev_full = int(table.loc[table["year"] == YEARS[-2], "cases"].sum()) if len(YEARS) > 1 else 0
+latest_yr = table[table["year"] == YEARS[-1]]
+st.markdown(f"""
+<div class="hero">
+  <div class="kicker">U.S. Measles Surveillance &amp; Vaccination Vulnerability</div>
+  <h1>Measles Watch USA</h1>
+  <p>Across U.S. states, is lower kindergarten MMR vaccination coverage linked to higher
+     measles incidence, 2024 to {YEARS[-1]}?</p>
+  <span class="pill"><b>{latest_total:,}</b> cases in {YEARS[-1]} so far</span>
+  <span class="pill"><b>{latest_total / max(prev_full, 1):.1f}×</b> all of {YEARS[-2]}</span>
+  <span class="pill"><b>{int(latest_yr['below_95'].sum())}</b> states below 95% MMR</span>
+  <span class="pill">Data through {LAST_DATE:%b %d, %Y}</span>
+</div>
+""", unsafe_allow_html=True)
 
-tabs = st.tabs(["Overview", "Trends", "Vaccination", "State Explorer", "Analysis", "Methods"])
+tabs = st.tabs(["Overview", "Trends", "Vaccination", "State Explorer", "Analysis",
+                "Methods", "Findings"])
 
 # ---------------------------------------------------------------- 1. Overview
 with tabs[0]:
+    st.markdown(f"""
+<div class="aim">
+  <span class="tag">Aim of the project</span>
+  <p style="margin:.35rem 0 .2rem;font-size:1.02rem;color:#1E2633">
+  U.S. measles cases are at their highest level since the disease was declared eliminated in 2000{cite(2)},
+  while kindergarten MMR coverage is slipping and exemptions are rising{cite(3, 4)}. This dashboard tracks where measles is spreading and tests whether
+  <b>states with lower kindergarten MMR coverage and higher exemptions carry higher measles rates</b>,
+  so that public-health teams can see where the risk is greatest.</p>
+  <ol>
+    <li><b>Burden</b>: count cases and rates per 100,000 for every state.</li>
+    <li><b>Timing</b>: show how the {YEARS[-1]} surge compares with earlier years.</li>
+    <li><b>Vulnerability</b>: flag states below the 95% MMR target{cite(1)}.</li>
+    <li><b>Relationship</b>: test whether coverage and incidence move together (Spearman).</li>
+  </ol>
+</div>
+""", unsafe_allow_html=True)
     st.subheader(f"Burden: where is measles worst in {year_label(year)}?")
     # same-week comparison with the previous year
     cum = weekly.groupby(["year", "week"])["cumulative"].sum()
@@ -135,22 +305,23 @@ with tabs[0]:
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Measles cases", f"{total:,}",
-              None if prev is None else f"{total - prev:+,} vs {year - 1} at week {wk_cmp}",
+              None if prev is None else f"{total - prev:+,} vs {year - 1}",
               delta_color="inverse")
     c2.metric("States reporting cases", f"{(yr['cases'] > 0).sum()} of 51")
     c3.metric("U.S. rate per 100,000", f"{pooled_rate(yr):.2f}")
     rep = yr.dropna(subset=["mmr_coverage"])
-    c4.metric(f"States below 95% MMR ({school_year})", f"{int(rep['below_95'].sum())} of {len(rep)}")
+    c4.metric("Below 95% MMR", f"{int(rep['below_95'].sum())} of {len(rep)}",
+              help=f"States reporting kindergarten MMR coverage under 95% in {school_year}.")
 
     left, right = st.columns([3, 2])
     with left:
-        st.plotly_chart(us_map(yr, mcol, mtitle, BLUES, mfmt), use_container_width=True)
+        st.plotly_chart(us_map(yr, mcol, mtitle, REDS, mfmt), width="stretch")
     with right:
         st.markdown(f"**Top 10 states by rate, {year}**")
         top = (yr.nlargest(10, "rate_per_100k")[["state", "cases", "rate_per_100k", "mmr_coverage"]]
                  .rename(columns={"state": "State", "cases": "Cases", "rate_per_100k": "Per 100k",
                                   "mmr_coverage": "MMR %"}))
-        st.dataframe(top, hide_index=True, use_container_width=True,
+        st.dataframe(top, hide_index=True, width="stretch",
                      column_config={"Per 100k": st.column_config.NumberColumn(format="%.2f"),
                                     "Cases": st.column_config.NumberColumn(format="%d"),
                                     "MMR %": st.column_config.NumberColumn(format="%.1f")})
@@ -165,13 +336,15 @@ with tabs[0]:
                      "States below 95%": int(g["below_95"].sum())}), include_groups=False)
                  .reset_index())
     summ["year"] = summ["year"].map(year_label)
-    st.dataframe(summ.rename(columns={"year": "Year"}), hide_index=True, use_container_width=True)
-    st.caption("Why it matters: at about 95% MMR coverage, measles cannot find enough susceptible "
-               "people to keep spreading. Below that level, outbreaks can grow.")
+    st.dataframe(summ.rename(columns={"year": "Year"}), hide_index=True, width="stretch")
+    st.markdown(f'<p style="font-size:.86rem;color:#6b7080">Why it matters: Healthy People 2030 sets a '
+                f'95% target for kindergarten MMR coverage{cite(1)}, about the level at which measles can no '
+                f'longer find enough susceptible people to keep spreading{cite(4)}. Below it, outbreaks '
+                f'can grow.</p>', unsafe_allow_html=True)
 
 # ---------------------------------------------------------------- 2. Trends
 with tabs[1]:
-    st.subheader("Timing: when did cases rise, and is 2026 worse?")
+    st.subheader(f"Timing: when did cases rise, and is {YEARS[-1]} worse?")
     nat = weekly.groupby(["year", "week", "week_ending"], as_index=False)[["cases", "cumulative"]].sum()
     nat["Year"] = nat["year"].astype(str)
     nat["shown"] = nat["cases"].clip(lower=0)
@@ -184,7 +357,7 @@ with tabs[1]:
                       marker_line_width=0)
     fig.update_layout(bargap=0.15, xaxis_title=None, yaxis_title="New cases reported that week")
     st.markdown("**Epidemic curve: new U.S. cases each week**")
-    st.plotly_chart(tidy(fig), use_container_width=True)
+    st.plotly_chart(tidy(fig), width="stretch")
 
     fig = go.Figure()
     for y in YEARS:
@@ -196,7 +369,7 @@ with tabs[1]:
                            showarrow=False, xanchor="left", font=dict(color=YEAR_COLORS.get(y)))
     fig.update_layout(xaxis_title="MMWR week", yaxis_title="Cumulative cases", hovermode="x unified")
     st.markdown("**Running total by week, year over year**")
-    st.plotly_chart(tidy(fig), use_container_width=True)
+    st.plotly_chart(tidy(fig), width="stretch")
 
     # when did the latest year pass the previous full-year total?
     if len(YEARS) >= 2:
@@ -241,18 +414,18 @@ with tabs[2]:
         fig.add_vline(x=TARGET, line_dash="dash", line_color="#52514e",
                       annotation_text="95% target", annotation_position="top")
         lo = np.floor(d["mmr_coverage"].min()) - 2
-        fig.update_layout(xaxis=dict(range=[lo, 100], title="Kindergartners with 2 doses MMR (%)"),
+        fig.update_layout(xaxis=dict(range=[lo, 100], title="Kindergartners up to date with MMR (%)"),
                           yaxis=dict(title=None, tickfont=dict(size=10)), bargap=0.25)
         st.markdown("**MMR coverage by state**")
-        st.plotly_chart(tidy(fig, height=900), use_container_width=True)
+        st.plotly_chart(tidy(fig, height=900), width="stretch")
     with right:
-        st.markdown("**Any-exemption rate by state**")
-        st.plotly_chart(us_map(yr, "exemption_rate", "Exemptions %", "Oranges", ".1f"),
-                        use_container_width=True)
+        st.markdown("**Any-exemption rate by state** (exempt from at least one required vaccine)")
+        st.plotly_chart(us_map(yr, "exemption_rate", "Exemptions %", BLUES, ".1f"),
+                        width="stretch")
         st.markdown("**Highest exemption rates**")
         ex = (yr.nlargest(10, "exemption_rate")[["state", "exemption_rate", "mmr_coverage"]]
                 .rename(columns={"state": "State", "exemption_rate": "Exemptions %", "mmr_coverage": "MMR %"}))
-        st.dataframe(ex, hide_index=True, use_container_width=True)
+        st.dataframe(ex, hide_index=True, width="stretch")
         missing = yr.loc[yr["mmr_coverage"].isna(), "state"].tolist()
         if missing:
             st.caption("Not reported this school year: " + ", ".join(missing) + ".")
@@ -278,7 +451,7 @@ with tabs[3]:
     c5.metric("Exemption rate",
               "Not reported" if pd.isna(row["exemption_rate"]) else f"{row['exemption_rate']:.1f}%",
               None if pd.isna(row["exemption_rate"]) else
-              f"{row['exemption_rate'] - yr['exemption_rate'].median():+.1f} vs U.S. median",
+              f"{row['exemption_rate'] - yr['exemption_rate'].median():+.1f} vs state median",
               delta_color="inverse")
 
     w = weekly[weekly["state"] == pick].copy()
@@ -289,14 +462,14 @@ with tabs[3]:
     fig.update_traces(hovertemplate="Week ending %{x|%b %d, %Y}<br>New cases: %{customdata[1]:,}<extra></extra>")
     fig.update_layout(xaxis_title=None, yaxis_title="New cases that week", bargap=0.15)
     st.markdown(f"**Weekly measles cases, {pick}**")
-    st.plotly_chart(tidy(fig, 320), use_container_width=True)
+    st.plotly_chart(tidy(fig, 320), width="stretch")
 
     show = s[["year", "school_year", "cases", "population", "rate_per_100k", "mmr_coverage", "exemption_rate"]].copy()
     show["year"] = show["year"].map(year_label)
     st.dataframe(show.rename(columns={"year": "Year", "school_year": "School year", "cases": "Cases",
                                       "population": "Population", "rate_per_100k": "Per 100k",
                                       "mmr_coverage": "MMR %", "exemption_rate": "Exemptions %"}),
-                 hide_index=True, use_container_width=True,
+                 hide_index=True, width="stretch",
                  column_config={"Population": st.column_config.NumberColumn(format="localized"),
                                 "Per 100k": st.column_config.NumberColumn(format="%.2f")})
 
@@ -327,19 +500,20 @@ with tabs[4]:
                       annotation_text="95% target", annotation_position="top")
     fig.update_layout(xaxis_title=f"{exposure} (%), matched school year",
                       yaxis_title="Measles cases per 100,000")
-    st.plotly_chart(tidy(fig, 460), use_container_width=True)
+    st.plotly_chart(tidy(fig, 460), width="stretch")
 
     # Spearman by year + pooled
     rows = []
-    for label, g in [(year_label(y), table[table["year"] == y]) for y in YEARS] + [("All years pooled", table)]:
+    for label, g in [(year_label(y), table[table["year"] == y]) for y in YEARS] + [("All years pooled (state-years)", table)]:
         rho, p, n = spearman(g[xcol], g["rate_per_100k"])
-        rows.append({"Years": label, "Spearman ρ": round(rho, 2), "p-value": "<0.001" if p < 0.001 else f"{p:.3f}", "States (n)": n})
+        rows.append({"Years": label, "Spearman ρ": round(rho, 2),
+                     "p-value": "<0.001" if p < 0.001 else f"{p:.3f}", "n": n})
     corr = pd.DataFrame(rows)
 
     left, right = st.columns(2)
     with left:
         st.markdown(f"**Spearman correlation: {exposure} vs. measles rate**")
-        st.dataframe(corr, hide_index=True, use_container_width=True)
+        st.dataframe(corr, hide_index=True, width="stretch")
         st.caption("Spearman compares the ranking of states, so one very large outbreak cannot "
                    "dominate. p-values come from a 5,000-permutation test. The pooled row counts each "
                    "state three times, so its p-value is optimistic.")
@@ -366,7 +540,7 @@ with tabs[4]:
         fig.update_layout(xaxis=dict(title=None, type="category"), yaxis_title="Cases per 100,000",
                           bargap=0.3, bargroupgap=0.08)
         st.markdown("**States below vs. at or above 95% MMR coverage**")
-        st.plotly_chart(tidy(fig, 340), use_container_width=True)
+        st.plotly_chart(tidy(fig, 340), width="stretch")
 
     st.warning("**How to read this.** This is an ecological comparison of states, not people. "
                "Say: *“States with lower kindergarten MMR coverage tended to have higher measles "
@@ -376,59 +550,214 @@ with tabs[4]:
 # ---------------------------------------------------------------- 6. Methods
 with tabs[5]:
     st.subheader("Methods")
+    fr = weekly.groupby("year")[["cases", "cases_first_reported"]].sum()
+    demo_y = YEARS[-2] if len(YEARS) > 1 else YEARS[-1]
+    match_rows = "\n".join(
+        f"| {y} | {sy} | {py} |" for y, sy, py in
+        table[["year", "school_year", "pop_year"]].drop_duplicates().sort_values("year").itertuples(index=False))
     st.markdown(f"""
-**Design.** Ecological study of 50 states + DC, January 2024 through MMWR week {LAST_WEEK} of
-{YEARS[-1]} (week ending {LAST_DATE:%B %d, %Y}). {YEARS[-1]} is year to date.
+**Design.** Ecological study of the 50 states and the District of Columbia, January {YEARS[0]} through
+MMWR week {LAST_WEEK} of {YEARS[-1]} (week ending {LAST_DATE:%B %d, %Y}). MMWR weeks are CDC's
+standard Sunday-to-Saturday reporting weeks. {YEARS[-1]} is year to date.
 
 **Data sources**
 
 | Data | Source | Used |
 |---|---|---|
-| Weekly measles cases | [CDC NNDSS Weekly Data](https://data.cdc.gov/d/x9gk-5huc) (provisional) | 2024–{YEARS[-1]} |
-| MMR coverage & exemptions | [CDC SchoolVaxView: Vaccination Coverage and Exemptions among Kindergartners](https://data.cdc.gov/d/ijqb-a7ye) | 2023-24 to 2025-26 |
-| Population | [U.S. Census Bureau, Vintage 2025 (NST-EST2025-ALLDATA)](https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html) | 2024, 2025 |
+| Weekly measles cases | CDC NNDSS Weekly Data, provisional{cite(5)} | {YEARS[0]}–{YEARS[-1]} |
+| MMR coverage and exemptions | CDC SchoolVaxView, Vaccination Coverage and Exemptions among Kindergartners{cite(6)} | {table["school_year"].min()} to {table["school_year"].max()} |
+| Population | U.S. Census Bureau, Vintage 2025 (NST-EST2025-ALLDATA){cite(7)} | {table["pop_year"].min()}–{table["pop_year"].max()} |
 
 **Definitions**
-- **Cases**: measles, indigenous + imported. New York City is added to New York State.
-- **Annual cases**: CDC's cumulative year-to-date count at the last reported week. Each week's
-  cases are the increase in that count since the previous week, so adding up the weeks gives
-  CDC's total exactly. *Why not add up the "current week" column?* That column is frozen when first
-  published and never picks up late reports. For 2025 it adds to 676 cases, against CDC's cumulative 2,026.
-- **Rate per 100,000** = annual cases ÷ July 1 population × 100,000. {YEARS[-1]} uses the 2025 population.
-- **MMR coverage**: % of kindergartners with 2 doses of MMR. **Exemption rate**: % with any exemption
-  (medical or non-medical).
-- **Below 95%**: MMR coverage under 95%, roughly the level needed to stop measles spreading.
+- **Cases**: measles, indigenous plus imported. New York City is reported separately in NNDSS and is
+  added to New York State.
+- **Annual cases**: CDC's cumulative year-to-date count at the last reported week. Each week's cases are
+  the increase in that count since the previous week, so the weekly values add up to CDC's total exactly.
+  The "current week" column is not used for totals because it keeps each week's count as first
+  published and never picks up late reports. For {demo_y} it adds up to {int(fr.loc[demo_y, "cases_first_reported"]):,}
+  cases, against CDC's cumulative total of {int(fr.loc[demo_y, "cases"]):,}.
+- **Rate per 100,000** = annual cases ÷ July 1 resident population × 100,000.
+- **MMR coverage**: percentage of kindergartners up to date with the MMR doses their state requires for
+  school entry. That is two doses in most states, but a few states differ{cite(1)}.
+- **Exemption rate**: percentage of kindergartners with an exemption (medical or nonmedical) from
+  **at least one** required vaccine. It is not specific to MMR{cite(1)}.
+- **Below 95%**: MMR coverage under the Healthy People 2030 target of 95%{cite(1)}.
+- SchoolVaxView also lists "NY-City of New York" and "TX-City of Houston" separately. The statewide
+  "New York" and "Texas" rows already include them, so the statewide rows are used.
 
-**Matching school years to case years.** Coverage is measured in the fall, so it describes
-children in school during the following calendar year.
+**Matching school years to case years.** Kindergarten coverage is assessed in the fall of each school
+year, so it describes the children in kindergarten during the following calendar year (for example, the
+2024-25 school year is matched to 2025 cases). {YEARS[-1]} uses the latest Census estimate.
 
 | Case year | School year | Population year |
 |---|---|---|
-| 2024 | 2023-24 | 2024 |
-| 2025 | 2024-25 | 2025 |
-| 2026 | 2025-26 | 2025 |
+{match_rows}
 
-**Statistics.** Spearman rank correlation between state coverage (or exemptions) and rate, by year
-and pooled, with permutation p-values. Group comparison of median and combined rates for states below
-vs. at or above 95%.
+**Joins.** Cases are joined to population on state and population year (many-to-one), and then to
+coverage on state and school year (one-to-one). The cleaning script stops with an error if any key is
+duplicated, and it checks that the 51-state totals equal CDC's national "U.S. residents" total each year.
+The result is 51 states × {len(YEARS)} years = {len(table)} rows.
+
+**Statistics.** Spearman rank correlation between state coverage (or exemptions) and rate, by year and
+pooled, with two-sided permutation p-values (5,000 permutations). States below 95% are compared with
+states at or above 95% using the median state rate and the combined rate (all cases ÷ all population).
 
 **Limitations**
 - *Ecological design.* A state can have 96% coverage overall and still have one under-vaccinated
   community where an outbreak takes off. State averages hide those pockets.
 - *Association, not cause.* Travel, outbreak timing and local factors also affect where measles appears.
 - *Outbreaks are clumpy.* One large outbreak can dominate a whole state's rate.
-- *Provisional counts.* NNDSS numbers are revised. Totals may differ from CDC's measles page or final
-  annual counts, which also use a different case definition and timing.
-- *One age group.* Kindergarten coverage does not describe teenagers or adults.
+- *Provisional counts.* NNDSS figures are revised over time and can differ from CDC's measles page,
+  which is compiled separately. For example, CDC's page reported 4,410 confirmed 2026 cases as of
+  October 15, 2026, including 18 among international visitors{cite(8)}.
+- *Exemption measure.* The exemption rate covers any required vaccine, not MMR alone.
+- *One age group.* Kindergarten coverage does not describe older children or adults.
 - *Uneven reporting.* States collect school vaccination data differently, and some skip years.
 - *Location.* Cases are counted in the reporting state, which may not be where infection happened.
-- *2026 population.* 2026 rates use the 2025 population estimate.
-""")
+- *{YEARS[-1]} population.* {YEARS[-1]} rates use the {int(table["pop_year"].max())} population estimate.
+""", unsafe_allow_html=True)
     missing = table[table["mmr_coverage"].isna()][["state", "school_year"]]
     if len(missing):
-        st.caption("Coverage not reported: " +
+        st.caption("MMR coverage not reported: " +
                    "; ".join(f"{a} ({b})" for a, b in missing.values) + ".")
+    st.markdown(references_html(), unsafe_allow_html=True)
     st.download_button("Download the merged state-year table (CSV)",
                        table.drop(columns=["abbr", "target_status"]).to_csv(index=False),
                        "measles_state_year.csv", "text/csv")
     st.caption("Built with Python, pandas, Plotly and Streamlit.")
+
+# ---------------------------------------------------------------- 7. Findings
+def strength(r: float) -> str:
+    a = abs(r)
+    return "weak" if a < 0.2 else "modest" if a < 0.4 else "moderate" if a < 0.6 else "strong"
+
+
+with tabs[6]:
+    tot = table.groupby("year")["cases"].sum()
+    with_cases = table.groupby("year")["cases"].apply(lambda c: int((c > 0).sum()))
+    first, last = YEARS[0], YEARS[-1]
+    growth = tot[last] / max(tot[first], 1)
+
+    stats = {}
+    for y in YEARS:
+        g = table[table["year"] == y]
+        rho, p, n = spearman(g["mmr_coverage"], g["rate_per_100k"])
+        rho_e, p_e, _ = spearman(g["exemption_rate"], g["rate_per_100k"])
+        rep_y = g.dropna(subset=["mmr_coverage"])
+        lo, hi = rep_y[rep_y["below_95"] == 1], rep_y[rep_y["below_95"] == 0]
+        stats[y] = dict(rho=rho, p=p, n=n, rho_e=rho_e, p_e=p_e,
+                        r_lo=pooled_rate(lo), r_hi=pooled_rate(hi),
+                        ratio=pooled_rate(lo) / pooled_rate(hi) if pooled_rate(hi) > 0 else np.nan,
+                        n_lo=len(lo), n_rep=len(rep_y))
+    best = min(YEARS, key=lambda y: stats[y]["rho"])
+    pooled_rho, pooled_p, pooled_n = spearman(table["mmr_coverage"], table["rate_per_100k"])
+    ly = table[table["year"] == last].sort_values("cases", ascending=False)
+    top3, top3_share = ly["state"].head(3).tolist(), ly["cases"].head(3).sum() / max(ly["cases"].sum(), 1)
+    sy = table.groupby("school_year")[["mmr_coverage", "exemption_rate"]].median()
+    sy0, sy1 = sy.index[0], sy.index[-1]
+    fmt_p = lambda p: "p < 0.001" if p < 0.001 else f"p = {p:.3f}"
+    s_last = stats[last]
+    # week in which the latest year passed the previous year's full-year total
+    natc = weekly.groupby(["year", "week"])["cumulative"].sum()
+    passed = natc.loc[last][natc.loc[last] > tot[YEARS[-2]]] if len(YEARS) > 1 else natc.loc[last].iloc[:0]
+    passed_txt = (f"{last} passed {YEARS[-2]}'s full-year total in MMWR week {int(passed.index[0])}."
+                  if len(passed) else f"{last} has not yet passed {YEARS[-2]}'s total.")
+
+    st.markdown(f"""
+<div class="abstract">
+  <h3>Lower kindergarten MMR coverage and measles incidence across U.S. states, {first}–{last}</h3>
+  <div class="meta">Structured abstract · Ecological study · Data through MMWR week {LAST_WEEK},
+  {last} (week ending {LAST_DATE:%B %d, %Y}) · Figures update automatically when the data are refreshed</div>
+  <p><b class="h">Background</b>Kindergarten MMR coverage of at least 95% is the Healthy People 2030 target{cite(1)}
+  and roughly the level needed to stop measles spreading{cite(4)}. U.S. measles cases in 2026 reached their
+  highest level since elimination was declared in 2000{cite(2)}, while kindergarten MMR coverage has fallen
+  and exemptions have risen{cite(3, 4)}.</p>
+  <p><b class="h">Objective</b>To test whether U.S. states with lower kindergarten MMR coverage, or
+  higher vaccine exemption rates, had higher measles incidence from {first} to {last}.</p>
+  <p><b class="h">Methods</b>We linked CDC NNDSS provisional measles counts (indigenous plus imported){cite(5)}
+  for the 50 states and DC with CDC SchoolVaxView kindergarten MMR coverage and exemption rates for the
+  matching school year{cite(6)}, and with Census Vintage 2025 population estimates{cite(7)}. That gives
+  51 states × {len(YEARS)} years = {len(table)} state-years. Annual cases were taken from CDC's cumulative
+  year-to-date counts. The exemption rate counts exemptions from any required vaccine, not MMR alone{cite(1)}.
+  We calculated rates per 100,000 and Spearman rank correlations with permutation p-values, and compared
+  states below 95% coverage with those at or above it.</p>
+  <p><b class="h">Results</b>Reported cases rose from {tot[first]:,} in {first} ({with_cases[first]} states)
+  to {tot[YEARS[1]]:,} in {YEARS[1]} and {tot[last]:,} in {last} through week {LAST_WEEK}
+  ({with_cases[last]} states), a {growth:.0f}-fold increase with {last} still incomplete. Median state MMR coverage moved from
+  {sy.loc[sy0, 'mmr_coverage']:.1f}% ({sy0}) to {sy.loc[sy1, 'mmr_coverage']:.1f}% ({sy1}), and the median
+  exemption rate from {sy.loc[sy0, 'exemption_rate']:.1f}% to {sy.loc[sy1, 'exemption_rate']:.1f}%;
+  {s_last['n_lo']} of {s_last['n_rep']} reporting states were below 95% in {sy1}.
+  The coverage–incidence association was strongest in {best} (ρ = {stats[best]['rho']:.2f},
+  {fmt_p(stats[best]['p'])}, n = {stats[best]['n']}), when states below 95% had a combined rate
+  {stats[best]['ratio']:.1f}× that of states at or above 95% ({stats[best]['r_lo']:.2f} vs.
+  {stats[best]['r_hi']:.2f} per 100,000). In {last} the association was {strength(s_last['rho'])}
+  (ρ = {s_last['rho']:.2f}, {fmt_p(s_last['p'])}); {", ".join(top3[:-1])} and {top3[-1]} accounted
+  for {top3_share:.0%} of cases. Pooled across years, ρ = {pooled_rho:.2f} ({fmt_p(pooled_p)}, n = {pooled_n} state-years).</p>
+  <p><b class="h">Conclusions</b>States with lower kindergarten MMR coverage tended to have higher measles
+  rates, most clearly in {best}. The relationship is inconsistent from year to year, because a few large,
+  localized outbreaks can dominate state rates, and state averages hide under-vaccinated communities.
+  These are ecological associations and do not show individual-level risk. Even so, the results support
+  closing coverage gaps toward the 95% target{cite(1)}, especially where exemptions are rising.</p>
+  <div class="kw"><b>Keywords:</b> measles · MMR vaccination · vaccine exemptions · kindergarten ·
+  surveillance · NNDSS · ecological study · United States</div>
+</div>
+""", unsafe_allow_html=True)
+
+    st.markdown("### Key findings")
+    cards = [
+        ("red", "Surge", f"{growth:.0f}×",
+         f"Measles cases, {first} → {last}",
+         f"{tot[first]:,} cases in {first} became {tot[last]:,} in {last} (through week {LAST_WEEK}). "
+         f"{passed_txt}"),
+        ("blue", "Vulnerability", f"{s_last['n_lo']} of {s_last['n_rep']}",
+         f"States below 95% MMR ({sy1})",
+         f"Median state coverage is {sy.loc[sy1, 'mmr_coverage']:.1f}%. The median exemption rate "
+         f"rose from {sy.loc[sy0, 'exemption_rate']:.1f}% ({sy0}) to {sy.loc[sy1, 'exemption_rate']:.1f}%."),
+        ("red", "Relationship", f"{stats[best]['ratio']:.1f}×",
+         f"Higher rate in below-95% states, {best}",
+         f"Spearman ρ = {stats[best]['rho']:.2f} ({fmt_p(stats[best]['p'])}). Lower coverage went with "
+         f"more measles, most clearly in {best}."),
+        ("blue", "Clustering", f"{top3_share:.0%}",
+         f"Of {last} cases in three states",
+         f"{', '.join(top3)}. A few big outbreaks drive the totals, which weakens state-level "
+         f"correlations (ρ = {s_last['rho']:.2f} in {last})."),
+    ]
+    cols = st.columns(4)
+    for col, (tone, tag, big, title, body) in zip(cols, cards):
+        col.markdown(f'<div class="card {tone}"><span class="tag">{tag}</span>'
+                     f'<div class="big">{big}</div><h4>{title}</h4><p>{body}</p></div>',
+                     unsafe_allow_html=True)
+
+    st.markdown("### In the news")
+    articles = [
+        ("Johns Hopkins IVAC [2]", "Jul 22, 2026",
+         "2026 U.S. measles cases surpass 2025 level, highest since declared eliminated in 2000",
+         "2,295 confirmed cases by July 21, 2026, already past 2025's 2,289. The most since 1991.",
+         "https://publichealth.jhu.edu/ivac/2026-us-measles-cases-surpass-2025-level"),
+        ("Georgetown CCF [3]", "Aug 25, 2026",
+         "New CDC data shows increase in vaccine exemptions and less vaccine coverage nationally",
+         "Kindergarten MMR coverage fell to 92.4% in 2025-26, and exemptions rose to 4.2% (about 155,000 children).",
+         "https://ccf.georgetown.edu/2026/08/25/new-cdc-data-shows-increase-in-vaccine-exemptions-and-less-vaccine-coverage-nationally/"),
+        ("AHCJ [4]", "Sep 2, 2026",
+         "SchoolVaxView offers data and trends on kindergarten vaccination rates",
+         "A reporter's guide to CDC's school vaccination data. Exemptions from at least one vaccine rose 17% in 2025-26.",
+         "https://healthjournalism.org/blog/2026/09/schoolvaxview-offers-data-and-trends-on-kindergarten-vaccination-rates"),
+        ("CDC [8]", "Updated Oct 16, 2026",
+         "Measles cases and outbreaks",
+         "CDC's official confirmed-case count (4,410 in 2026 as of Oct 15), plus outbreaks, ages and vaccination status.",
+         "https://www.cdc.gov/measles/data-research/index.html"),
+    ]
+    cols = st.columns(4)
+    for col, (src, date, title, blurb, url) in zip(cols, articles):
+        col.markdown(f'<a class="article" href="{url}" target="_blank" rel="noopener">'
+                     f'<span class="src">{src}</span><span class="h5">{title}</span>'
+                     f'<span class="p">{blurb}</span><span class="date">{date} · Read ↗</span></a>',
+                     unsafe_allow_html=True)
+    st.caption("National totals in news reports come from CDC's measles page and can differ from "
+               "the provisional NNDSS counts used in this dashboard. See Methods.")
+    st.markdown(references_html() +
+                f'<div class="howcite"><b>How to cite this dashboard:</b> Patil, S. ({LAST_DATE:%Y}). '
+                f'<i>Measles Watch USA: U.S. measles surveillance and vaccination vulnerability dashboard</i> '
+                f'[Interactive dashboard]. Data through {LAST_DATE:%B %d, %Y}. '
+                f'<a href="https://salonipatil.com/research" target="_blank">salonipatil.com/research</a></div>'
+                + author_html(), unsafe_allow_html=True)
