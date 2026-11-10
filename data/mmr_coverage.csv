@@ -1,0 +1,154 @@
+state,school_year,mmr_coverage,exemption_rate
+Alabama,2023-24,93.8,2.2
+Alabama,2024-25,95.2,2.3
+Alabama,2025-26,94.3,3.0
+Alaska,2023-24,84.3,9.5
+Alaska,2024-25,81.2,9.4
+Alaska,2025-26,89.9,8.6
+Arizona,2023-24,89.3,8.5
+Arizona,2024-25,88.6,9.1
+Arizona,2025-26,87.4,10.6
+Arkansas,2023-24,92.5,3.5
+Arkansas,2024-25,89.6,3.6
+Arkansas,2025-26,91.5,4.6
+California,2023-24,96.2,0.1
+California,2024-25,96.1,0.1
+California,2025-26,95.7,0.1
+Colorado,2023-24,88.3,4.2
+Colorado,2024-25,88.0,4.2
+Colorado,2025-26,87.7,4.7
+Connecticut,2023-24,97.7,0.5
+Connecticut,2024-25,98.2,0.4
+Connecticut,2025-26,98.6,0.5
+Delaware,2023-24,93.8,2.5
+Delaware,2024-25,94.1,2.6
+Delaware,2025-26,93.5,2.2
+District of Columbia,2023-24,92.0,2.3
+District of Columbia,2024-25,92.7,2.7
+District of Columbia,2025-26,94.4,3.4
+Florida,2023-24,88.1,4.8
+Florida,2024-25,88.8,5.1
+Florida,2025-26,88.9,5.9
+Georgia,2023-24,88.4,3.6
+Georgia,2024-25,86.8,4.8
+Georgia,2025-26,89.1,5.1
+Hawaii,2023-24,89.8,5.3
+Hawaii,2024-25,90.1,5.6
+Hawaii,2025-26,89.3,6.0
+Idaho,2023-24,79.6,14.3
+Idaho,2024-25,78.5,15.4
+Idaho,2025-26,75.2,17.5
+Illinois,2023-24,91.6,2.5
+Illinois,2024-25,91.8,2.8
+Illinois,2025-26,92.8,3.5
+Indiana,2023-24,90.8,2.4
+Indiana,2024-25,90.8,2.6
+Indiana,2025-26,90.1,3.8
+Iowa,2023-24,89.1,3.4
+Iowa,2024-25,88.8,3.9
+Iowa,2025-26,88.9,4.9
+Kansas,2023-24,90.4,3.0
+Kansas,2024-25,91.0,3.6
+Kansas,2025-26,,4.5
+Kentucky,2023-24,90.0,2.3
+Kentucky,2024-25,86.9,2.2
+Kentucky,2025-26,91.1,2.6
+Louisiana,2023-24,92.4,2.8
+Louisiana,2024-25,92.6,3.1
+Louisiana,2025-26,90.3,4.0
+Maine,2023-24,97.5,1.0
+Maine,2024-25,97.6,0.8
+Maine,2025-26,98.0,0.8
+Maryland,2023-24,96.6,2.2
+Maryland,2024-25,96.4,2.2
+Maryland,2025-26,96.6,2.5
+Massachusetts,2023-24,96.3,1.4
+Massachusetts,2024-25,96.6,1.5
+Massachusetts,2025-26,96.5,1.8
+Michigan,2023-24,92.1,5.6
+Michigan,2024-25,91.6,6.8
+Michigan,2025-26,90.9,7.7
+Minnesota,2023-24,87.0,5.4
+Minnesota,2024-25,86.5,5.9
+Minnesota,2025-26,85.7,6.9
+Mississippi,2023-24,97.5,0.7
+Mississippi,2024-25,97.6,1.2
+Mississippi,2025-26,97.0,2.0
+Missouri,2023-24,90.4,4.7
+Missouri,2024-25,90.0,5.2
+Missouri,2025-26,89.5,6.3
+Montana,2023-24,,
+Montana,2024-25,,
+Montana,2025-26,,
+Nebraska,2023-24,93.9,3.5
+Nebraska,2024-25,94.2,4.0
+Nebraska,2025-26,92.8,4.7
+Nevada,2023-24,91.9,7.1
+Nevada,2024-25,91.3,7.1
+Nevada,2025-26,90.8,8.7
+New Hampshire,2023-24,89.2,4.1
+New Hampshire,2024-25,89.2,4.1
+New Hampshire,2025-26,88.2,5.4
+New Jersey,2023-24,93.2,3.9
+New Jersey,2024-25,92.8,4.7
+New Jersey,2025-26,92.5,5.7
+New Mexico,2023-24,95.0,1.6
+New Mexico,2024-25,94.8,2.0
+New Mexico,2025-26,95.1,2.2
+New York,2023-24,97.7,0.1
+New York,2024-25,97.8,0.1
+New York,2025-26,97.7,0.1
+North Carolina,2023-24,93.8,2.9
+North Carolina,2024-25,94.2,3.2
+North Carolina,2025-26,93.7,3.9
+North Dakota,2023-24,90.9,6.5
+North Dakota,2024-25,90.0,7.0
+North Dakota,2025-26,88.5,8.1
+Ohio,2023-24,89.2,4.2
+Ohio,2024-25,88.3,4.7
+Ohio,2025-26,88.1,5.7
+Oklahoma,2023-24,88.3,5.7
+Oklahoma,2024-25,88.7,5.7
+Oklahoma,2025-26,87.8,7.4
+Oregon,2023-24,91.2,8.9
+Oregon,2024-25,90.5,9.8
+Oregon,2025-26,89.6,11.0
+Pennsylvania,2023-24,93.5,5.0
+Pennsylvania,2024-25,92.4,6.0
+Pennsylvania,2025-26,92.7,6.0
+Rhode Island,2023-24,97.1,1.7
+Rhode Island,2024-25,96.7,1.9
+Rhode Island,2025-26,96.7,2.2
+South Carolina,2023-24,92.1,4.4
+South Carolina,2024-25,91.2,4.6
+South Carolina,2025-26,93.4,5.7
+South Dakota,2023-24,90.8,5.7
+South Dakota,2024-25,90.0,6.8
+South Dakota,2025-26,89.3,6.9
+Tennessee,2023-24,95.1,3.6
+Tennessee,2024-25,94.4,3.8
+Tennessee,2025-26,94.4,4.8
+Texas,2023-24,94.3,3.9
+Texas,2024-25,93.2,4.3
+Texas,2025-26,93.2,5.2
+Utah,2023-24,88.8,9.3
+Utah,2024-25,88.6,10.3
+Utah,2025-26,87.2,12.7
+Vermont,2023-24,92.9,4.0
+Vermont,2024-25,93.5,3.9
+Vermont,2025-26,93.8,3.8
+Virginia,2023-24,94.2,2.4
+Virginia,2024-25,95.6,2.7
+Virginia,2025-26,93.6,3.0
+Washington,2023-24,91.3,4.8
+Washington,2024-25,90.9,4.8
+Washington,2025-26,90.6,5.3
+West Virginia,2023-24,98.3,0.1
+West Virginia,2024-25,,
+West Virginia,2025-26,98.9,0.1
+Wisconsin,2023-24,84.8,7.7
+Wisconsin,2024-25,84.8,7.6
+Wisconsin,2025-26,85.1,8.2
+Wyoming,2023-24,93.5,5.6
+Wyoming,2024-25,93.6,5.9
+Wyoming,2025-26,92.6,7.2
