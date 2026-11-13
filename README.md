@@ -76,7 +76,7 @@ measles-watch-usa/
 ```
 
 ## References
-1. Seither R, Yusuf OB, Dramann D, Calhoun K, Mugerwa-Kasujja A, Knighton CL, et al. Coverage with selected vaccines and exemption rates among children in kindergarten — United States, 2023–24 school year. MMWR Morb Mortal Wkly Rep. 2024 Oct 17;73(41):925–32. doi:10.15585/mmwr.mm7341a3
+1. Seither R, Yusuf OB, Dramann D, Calhoun K, Mugerwa-Kasujja A, Knighton CL, et al. Coverage with selected vaccines and exemption rates among children in kindergarten — United States, 2023–24 school year. MMWR Morb Mortal Wkly Rep. 2024 Oct 17;73(41):925–32. doi: https://doi.org/10.15585/mmwr.mm7341a3
 2. Willens V. 2026 U.S. measles cases surpass 2025 level, highest since declared eliminated in 2000 [Internet]. Baltimore (MD): International Vaccine Access Center, Johns Hopkins Bloomberg School of Public Health; 2026 Jul 22 [cited 2026 Nov 13]. Available from: https://publichealth.jhu.edu/ivac/2026-us-measles-cases-surpass-2025-level
 3. Green H. New CDC data shows increase in vaccine exemptions and less vaccine coverage nationally [Internet]. Washington (DC): Center for Children and Families, Georgetown University McCourt School of Public Policy; 2026 Aug 25 [cited 2026 Nov 13]. Available from: https://ccf.georgetown.edu/2026/08/25/new-cdc-data-shows-increase-in-vaccine-exemptions-and-less-vaccine-coverage-nationally/
 4. Haelle T. SchoolVaxView offers data and trends on kindergarten vaccination rates [Internet]. Association of Health Care Journalists; 2026 Sep 2 [cited 2026 Nov 13]. Available from: https://healthjournalism.org/blog/2026/09/schoolvaxview-offers-data-and-trends-on-kindergarten-vaccination-rates/

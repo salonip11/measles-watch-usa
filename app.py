@@ -133,7 +133,7 @@ ABBR = {
 REFS = [
     ("Seither R, Yusuf OB, Dramann D, Calhoun K, Mugerwa-Kasujja A, Knighton CL, et al. Coverage with "
      "selected vaccines and exemption rates among children in kindergarten — United States, 2023–24 school "
-     "year. MMWR Morb Mortal Wkly Rep. 2024 Oct 17;73(41):925–32. doi:10.15585/mmwr.mm7341a3. Available from:",
+     "year. MMWR Morb Mortal Wkly Rep. 2024 Oct 17;73(41):925–32. doi:",
      "https://doi.org/10.15585/mmwr.mm7341a3"),
     ("Willens V. 2026 U.S. measles cases surpass 2025 level, highest since declared eliminated in 2000 "
      "[Internet]. Baltimore (MD): International Vaccine Access Center, Johns Hopkins Bloomberg School of "
