@@ -145,9 +145,9 @@ REFS = [
      "rates</i>. Association of Health Care Journalists.",
      "https://healthjournalism.org/blog/2026/09/schoolvaxview-offers-data-and-trends-on-kindergarten-vaccination-rates"),
     ("Centers for Disease Control and Prevention. (2026). <i>NNDSS weekly data</i> [Data set]. "
-     "Retrieved October 20, 2026.", "https://data.cdc.gov/d/x9gk-5huc"),
+     "Retrieved November 13, 2026.", "https://data.cdc.gov/d/x9gk-5huc"),
     ("Centers for Disease Control and Prevention. (2026). <i>Vaccination coverage and exemptions among "
-     "kindergartners</i> [Data set]. SchoolVaxView. Retrieved October 20, 2026.",
+     "kindergartners</i> [Data set]. SchoolVaxView. Retrieved November 13, 2026.",
      "https://data.cdc.gov/d/ijqb-a7ye"),
     ("U.S. Census Bureau. (2026). <i>State population totals and components of change: 2020–2025</i> "
      "(Vintage 2025, NST-EST2025-ALLDATA) [Data set].",
@@ -559,8 +559,8 @@ with tabs[4]:
         st.plotly_chart(tidy(fig, 340), width="stretch")
 
     st.warning("**How to read this.** This is an ecological comparison of states, not people. "
-               "Say: *“States with lower kindergarten MMR coverage tended to have higher measles "
-               "rates.”* Don't say: *“unvaccinated people got measles”*. State averages hide "
+               "Say: *“In years with a clear link, states with lower kindergarten MMR coverage had "
+               "higher measles rates.”* Don't say: *“unvaccinated people got measles”*. State averages hide "
                "under-vaccinated communities, and one large outbreak can dominate a state's rate.")
 
 # ---------------------------------------------------------------- 6. Methods
@@ -617,7 +617,9 @@ duplicated, and it checks that the 51-state totals equal CDC's national "U.S. re
 The result is 51 states × {len(YEARS)} years = {len(table)} rows.
 
 **Statistics.** Spearman rank correlation between state coverage (or exemptions) and rate, by year and
-pooled, with two-sided permutation p-values (5,000 permutations). States below 95% are compared with
+pooled, with two-sided permutation p-values (5,000 permutations). Because six year-specific tests were run
+(three years, two exposures), results are also checked against a Bonferroni-adjusted threshold of
+p < 0.0083. States below 95% are compared with
 states at or above 95% using the median state rate and the combined rate (all cases ÷ all population).
 
 **Limitations**
@@ -698,16 +700,23 @@ with tabs[6]:
         concl = "States with lower kindergarten MMR coverage had higher measles rates in every year studied."
     elif sig:
         concl = (f"States with lower kindergarten MMR coverage had clearly higher measles rates in "
-                 f"{join_years(sig)}, but not in {join_years(not_sig, "or")}. The link changes from year to year "
-                 f"because a few large, localized outbreaks can dominate state rates.")
+                 f"{join_years(sig)}, but not in {join_years(not_sig, "or")}. The link varied from year to year; one "
+                 f"likely reason is that a few large, localized outbreaks can dominate state rates.")
     else:
         concl = ("No single year showed a clear link between state MMR coverage and measles rates; a few "
-                 "large, localized outbreaks dominate state rates.")
+                 "large, localized outbreaks may dominate state rates.")
     sb = stats[best]
+    n_tests = 2 * len(YEARS)                      # MMR and exemptions, each year
+    thr = 0.05 / n_tests
     by_year_e = "; ".join(f"{y}: ρ = {neg(stats[y]['rho_e'])}, {fmt_p(stats[y]['p_e'])}" for y in YEARS)
     sig_e = [y for y in YEARS if stats[y]["p_e"] < 0.05 and stats[y]["rho_e"] > 0]
     exempt_txt = (f"Higher exemption rates went with higher measles rates in {join_years(sig_e)} ({by_year_e})."
                   if sig_e else f"Exemption rates showed no clear link with measles rates in any year ({by_year_e}).")
+    n_sig = len(sig) + len(sig_e)
+    n_keep = sum(stats[y]["p"] < thr for y in sig) + sum(stats[y]["p_e"] < thr for y in sig_e)
+    bonf_txt = ("" if n_sig == 0 else
+                f"After Bonferroni correction for {n_tests} year-specific tests (p &lt; {thr:.4f}), "
+                f"{n_keep} of {n_sig} significant results remained significant.")
 
     st.markdown(f"""
 <div class="abstract">
@@ -741,7 +750,7 @@ with tabs[6]:
   reporting states were at or above 95%, so these ratios are unstable. In {last} the association was
   {strength(s_last['rho'])}; {", ".join(top3[:-1])} and {top3[-1]} accounted for {top3_share:.0%} of cases.
   Pooled across years, ρ = {neg(pooled_rho)} ({fmt_p(pooled_p)}, n = {pooled_n} state-years); this p-value
-  is optimistic because each state appears once per year. {exempt_txt}</p>
+  is optimistic because each state appears once per year. {exempt_txt} {bonf_txt}</p>
   <p><b class="h">Conclusions</b>{concl} State averages also hide under-vaccinated communities.
   These are ecological associations and do not show individual-level risk, and a state-level analysis
   cannot show that raising coverage in a given state would lower its measles rate. The findings are
@@ -769,7 +778,7 @@ with tabs[6]:
          + (f" No clear link in {join_years(not_sig, "or")}." if not_sig else "")),
         ("blue", "Clustering", f"{top3_share:.0%}",
          f"Of {last} cases in three states",
-         f"{', '.join(top3)}. A few big outbreaks drive the totals, which weakens state-level "
+         f"{', '.join(top3)}. A few big outbreaks drive the totals, which can weaken state-level "
          f"correlations (ρ = {neg(s_last['rho'])} in {last})."),
     ]
     cols = st.columns(4)
