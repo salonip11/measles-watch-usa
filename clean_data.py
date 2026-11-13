@@ -11,10 +11,11 @@ Writes to data/:
 
 About "cases": NNDSS's weekly column (m1) is frozen as first reported, so cases
 reported late are never added back. Summing m1 gives 676 measles cases for 2025,
-but CDC's own cumulative total (m3) is 2,026. We therefore define each week's
+but the NNDSS cumulative total (m3) is 2,026. We therefore define each week's
 cases as the increase in the cumulative year-to-date count (m3) since the
-previous week. Summing those weeks reproduces the official year-to-date total
-exactly. m1 is kept as cases_first_reported for reference.
+previous week. Summing those weeks reproduces the NNDSS cumulative total
+exactly. m1 is kept as cases_first_reported for reference. (CDC's measles page
+reports slightly higher final counts for past years, e.g. 2,289 for 2025.)
 """
 import argparse
 import io
@@ -111,9 +112,9 @@ def load_nndss(raw: Path | None) -> pd.DataFrame:
 
 
 def national_totals(df: pd.DataFrame) -> pd.Series:
-    """CDC's own 'U.S. residents' cumulative total at the last week of each year (for checks)."""
+    """CDC's national row ('U.S. Residents, excluding U.S. Territories') at the last week of each year."""
     us = df[df["label"].isin(MEASLES_LABELS)
-            & df["states"].str.strip().str.upper().isin(["US RESIDENTS", "U.S. RESIDENTS"])].copy()
+            & df["states"].str.upper().str.replace(".", "", regex=False).str.strip().str.startswith("US RESIDENTS")].copy()
     us["year"], us["week"], us["m3"] = us["year"].astype(int), us["week"].astype(int), to_num(us["m3"]).fillna(0)
     us = us[us["week"] == us.groupby("year")["week"].transform("max")]
     return us.groupby("year")["m3"].sum().astype(int)
@@ -249,6 +250,8 @@ def main() -> None:
     print(f"\nMerged table: {len(table)} rows, blank population: "
           f"{table['population'].isna().sum()}, blank coverage: {table['mmr_coverage'].isna().sum()}"
           f"  {'[OK]' if ok else '[CHECK]'}")
+    if us_total.empty:
+        print("  [CHECK] No 'U.S. residents' rows found in NNDSS, so the national cross-check was skipped.")
     for y, g in table.groupby("year"):
         match = us_total.get(y)
         flag = "" if match is None else ("  = CDC U.S. total [OK]" if match == g["cases"].sum()

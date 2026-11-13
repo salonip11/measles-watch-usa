@@ -13,6 +13,20 @@ import streamlit as st
 DATA = Path(__file__).parent / "data"
 TARGET = 95.0
 
+
+def neg(x: float, d: int = 2) -> str:
+    """Number with a true minus sign, as journals print it."""
+    return f"{x:.{d}f}".replace("-", "\u2212")
+
+
+def r1(x: float) -> str:
+    """One decimal place, rounding halves up (4.85 -> 4.9)."""
+    return f"{np.floor(x * 10 + 0.5 + 1e-9) / 10:.1f}"
+
+# CDC's confirmed counts for completed years, as reported in reference 3, used only to show how far the
+# provisional NNDSS totals fall short for completed years.
+CDC_FINAL = {2024: 285, 2025: 2289}
+
 # Colors (validated categorical order; status colors reserved for target flags)
 YEAR_COLORS = {2024: "#2a78d6", 2025: "#eb6834", 2026: "#1baf7a"}
 BELOW, AT = "#d03b3b", "#0ca30c"
@@ -137,8 +151,9 @@ REFS = [
      "https://data.cdc.gov/d/ijqb-a7ye"),
     ("U.S. Census Bureau. (2026). <i>State population totals and components of change: 2020–2025</i> "
      "(Vintage 2025, NST-EST2025-ALLDATA) [Data set].",
-     "https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html"),
-    ("Centers for Disease Control and Prevention. (2026, October 16). <i>Measles cases and outbreaks</i>.",
+     "https://www.census.gov/data/datasets/time-series/demo/popest/2020s-state-total.html"),
+    ("Centers for Disease Control and Prevention. (2026, October 16). <i>Measles cases and outbreaks</i>. "
+     "Retrieved October 16, 2026.",
      "https://www.cdc.gov/measles/data-research/index.html"),
 ]
 
@@ -269,7 +284,7 @@ st.markdown(f"""
   <p>Across U.S. states, is lower kindergarten MMR vaccination coverage linked to higher
      measles incidence, 2024 to {YEARS[-1]}?</p>
   <span class="pill"><b>{latest_total:,}</b> cases in {YEARS[-1]} so far</span>
-  <span class="pill"><b>{latest_total / max(prev_full, 1):.1f}×</b> all of {YEARS[-2]}</span>
+  <span class="pill"><b>{latest_total / max(prev_full, 1):.1f}×</b> the {YEARS[-2]} NNDSS total</span>
   <span class="pill"><b>{int(latest_yr['below_95'].sum())}</b> states below 95% MMR</span>
   <span class="pill">Data through {LAST_DATE:%b %d, %Y}</span>
 </div>
@@ -305,13 +320,14 @@ with tabs[0]:
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Measles cases", f"{total:,}",
-              None if prev is None else f"{total - prev:+,} vs {year - 1}",
+              None if prev is None else f"{total - prev:+,} vs same week {year - 1}",
               delta_color="inverse")
     c2.metric("States reporting cases", f"{(yr['cases'] > 0).sum()} of 51")
     c3.metric("U.S. rate per 100,000", f"{pooled_rate(yr):.2f}")
     rep = yr.dropna(subset=["mmr_coverage"])
     c4.metric("Below 95% MMR", f"{int(rep['below_95'].sum())} of {len(rep)}",
-              help=f"States reporting kindergarten MMR coverage under 95% in {school_year}.")
+              help=f"States reporting kindergarten MMR coverage under 95% in {school_year}. "
+                   f"Not reported: {', '.join(yr.loc[yr['mmr_coverage'].isna(), 'state']) or 'none'}.")
 
     left, right = st.columns([3, 2])
     with left:
@@ -380,9 +396,9 @@ with tabs[1]:
             r = passed.iloc[0]
             st.info(f"{YEARS[-1]} passed {YEARS[-2]}'s full-year total of {prev_total:,} cases in "
                     f"MMWR week {int(r['week'])} (week ending {r['week_ending']:%b %d}).")
-    st.caption("Weekly cases are the increase in CDC's cumulative count from one week to the next, so "
+    st.caption("Weekly cases are the increase in the NNDSS cumulative count from one week to the next, so "
                "late reports show up in the week they were added, not the week of illness onset. "
-               "A few weeks where CDC removed cases are shown as zero.")
+               "A few weeks where reported cases were later removed are shown as zero.")
 
 # ---------------------------------------------------------------- 3. Vaccination
 with tabs[2]:
@@ -398,8 +414,8 @@ with tabs[2]:
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("States below 95% MMR", f"{int(rep['below_95'].sum())} of {len(rep)}")
-    c2.metric("Median state MMR coverage", f"{rep['mmr_coverage'].median():.1f}%")
-    c3.metric("Median exemption rate", f"{yr['exemption_rate'].median():.1f}%")
+    c2.metric("Median state MMR coverage", f"{r1(rep['mmr_coverage'].median())}%")
+    c3.metric("Median exemption rate", f"{r1(yr['exemption_rate'].median())}%")
     c4.metric("States where coverage fell", "n/a" if dropped is None else f"{dropped}",
               help="Compared with the previous school year, among states reporting both years.")
 
@@ -552,6 +568,8 @@ with tabs[5]:
     st.subheader("Methods")
     fr = weekly.groupby("year")[["cases", "cases_first_reported"]].sum()
     demo_y = YEARS[-2] if len(YEARS) > 1 else YEARS[-1]
+    final_gap = "; ".join(f"{int(fr.loc[y, 'cases']):,} vs. {c:,} for {y}"
+                          for y, c in CDC_FINAL.items() if y in fr.index) or "see CDC's measles page"
     match_rows = "\n".join(
         f"| {y} | {sy} | {py} |" for y, sy, py in
         table[["year", "school_year", "pop_year"]].drop_duplicates().sort_values("year").itertuples(index=False))
@@ -571,11 +589,11 @@ standard Sunday-to-Saturday reporting weeks. {YEARS[-1]} is year to date.
 **Definitions**
 - **Cases**: measles, indigenous plus imported. New York City is reported separately in NNDSS and is
   added to New York State.
-- **Annual cases**: CDC's cumulative year-to-date count at the last reported week. Each week's cases are
-  the increase in that count since the previous week, so the weekly values add up to CDC's total exactly.
+- **Annual cases**: the NNDSS cumulative year-to-date count at the last reported week. Each week's cases are
+  the increase in that count since the previous week, so the weekly values add up to the NNDSS total exactly.
   The "current week" column is not used for totals because it keeps each week's count as first
   published and never picks up late reports. For {demo_y} it adds up to {int(fr.loc[demo_y, "cases_first_reported"]):,}
-  cases, against CDC's cumulative total of {int(fr.loc[demo_y, "cases"]):,}.
+  cases, against the NNDSS cumulative total of {int(fr.loc[demo_y, "cases"]):,}.
 - **Rate per 100,000** = annual cases ÷ July 1 resident population × 100,000.
 - **MMR coverage**: percentage of kindergartners up to date with the MMR doses their state requires for
   school entry. That is two doses in most states, but a few states differ{cite(1)}.
@@ -585,9 +603,9 @@ standard Sunday-to-Saturday reporting weeks. {YEARS[-1]} is year to date.
 - SchoolVaxView also lists "NY-City of New York" and "TX-City of Houston" separately. The statewide
   "New York" and "Texas" rows already include them, so the statewide rows are used.
 
-**Matching school years to case years.** Kindergarten coverage is assessed in the fall of each school
-year, so it describes the children in kindergarten during the following calendar year (for example, the
-2024-25 school year is matched to 2025 cases). {YEARS[-1]} uses the latest Census estimate.
+**Matching school years to case years.** Each school year runs from late summer to early summer, so most
+of it falls in the second calendar year. Each case year is therefore matched to the school year that ends in
+it (for example, 2024-25 coverage is matched to 2025 cases). {YEARS[-1]} uses the latest Census estimate.
 
 | Case year | School year | Population year |
 |---|---|---|
@@ -609,7 +627,10 @@ states at or above 95% using the median state rate and the combined rate (all ca
 - *Outbreaks are clumpy.* One large outbreak can dominate a whole state's rate.
 - *Provisional counts.* NNDSS figures are revised over time and can differ from CDC's measles page,
   which is compiled separately. For example, CDC's page reported 4,410 confirmed 2026 cases as of
-  October 15, 2026, including 18 among international visitors{cite(8)}.
+  October 15, 2026, including 18 among international visitors{cite(8)}. NNDSS totals also run below
+  CDC's confirmed counts for completed years ({final_gap}){cite(3)}, because the weekly tables end with the
+  last week of the year and miss later corrections. All year-to-year comparisons here use NNDSS for every
+  year, so they compare like with like.
 - *Exemption measure.* The exemption rate covers any required vaccine, not MMR alone.
 - *One age group.* Kindergarten coverage does not describe older children or adults.
 - *Uneven reporting.* States collect school vaccination data differently, and some skip years.
@@ -647,6 +668,7 @@ with tabs[6]:
         lo, hi = rep_y[rep_y["below_95"] == 1], rep_y[rep_y["below_95"] == 0]
         stats[y] = dict(rho=rho, p=p, n=n, rho_e=rho_e, p_e=p_e,
                         r_lo=pooled_rate(lo), r_hi=pooled_rate(hi),
+                        m_lo=lo["rate_per_100k"].median(), m_hi=hi["rate_per_100k"].median(),
                         ratio=pooled_rate(lo) / pooled_rate(hi) if pooled_rate(hi) > 0 else np.nan,
                         n_lo=len(lo), n_rep=len(rep_y))
     best = min(YEARS, key=lambda y: stats[y]["rho"])
@@ -655,7 +677,8 @@ with tabs[6]:
     top3, top3_share = ly["state"].head(3).tolist(), ly["cases"].head(3).sum() / max(ly["cases"].sum(), 1)
     sy = table.groupby("school_year")[["mmr_coverage", "exemption_rate"]].median()
     sy0, sy1 = sy.index[0], sy.index[-1]
-    fmt_p = lambda p: "p < 0.001" if p < 0.001 else f"p = {p:.3f}"
+    f1 = lambda x: f"{np.floor(x * 10 + 0.5 + 1e-9) / 10:.1f}"
+    fmt_p = lambda p: "p &lt; 0.001" if p < 0.001 else f"p = {p:.3f}"
     s_last = stats[last]
     # week in which the latest year passed the previous year's full-year total
     natc = weekly.groupby(["year", "week"])["cumulative"].sum()
@@ -663,41 +686,66 @@ with tabs[6]:
     passed_txt = (f"{last} passed {YEARS[-2]}'s full-year total in MMWR week {int(passed.index[0])}."
                   if len(passed) else f"{last} has not yet passed {YEARS[-2]}'s total.")
 
+    # which single years show a clear negative link (p < 0.05); the conclusion is written from this,
+    # so it stays true when the data are refreshed
+    def join_years(ys, word="and"):
+        ys = [str(y) for y in ys]
+        return ys[0] if len(ys) == 1 else ", ".join(ys[:-1]) + f" {word} " + ys[-1]
+    sig = [y for y in YEARS if stats[y]["p"] < 0.05 and stats[y]["rho"] < 0]
+    not_sig = [y for y in YEARS if y not in sig]
+    by_year = "; ".join(f"{y}: ρ = {neg(stats[y]['rho'])}, {fmt_p(stats[y]['p'])}" for y in YEARS)
+    if len(sig) == len(YEARS):
+        concl = "States with lower kindergarten MMR coverage had higher measles rates in every year studied."
+    elif sig:
+        concl = (f"States with lower kindergarten MMR coverage had clearly higher measles rates in "
+                 f"{join_years(sig)}, but not in {join_years(not_sig, "or")}. The link changes from year to year "
+                 f"because a few large, localized outbreaks can dominate state rates.")
+    else:
+        concl = ("No single year showed a clear link between state MMR coverage and measles rates; a few "
+                 "large, localized outbreaks dominate state rates.")
+    sb = stats[best]
+    by_year_e = "; ".join(f"{y}: ρ = {neg(stats[y]['rho_e'])}, {fmt_p(stats[y]['p_e'])}" for y in YEARS)
+    sig_e = [y for y in YEARS if stats[y]["p_e"] < 0.05 and stats[y]["rho_e"] > 0]
+    exempt_txt = (f"Higher exemption rates went with higher measles rates in {join_years(sig_e)} ({by_year_e})."
+                  if sig_e else f"Exemption rates showed no clear link with measles rates in any year ({by_year_e}).")
+
     st.markdown(f"""
 <div class="abstract">
   <h3>Lower kindergarten MMR coverage and measles incidence across U.S. states, {first}–{last}</h3>
   <div class="meta">Structured abstract · Ecological study · Data through MMWR week {LAST_WEEK},
-  {last} (week ending {LAST_DATE:%B %d, %Y}) · Figures update automatically when the data are refreshed</div>
+  {last} (week ending {LAST_DATE:%B %d, %Y}) · Figures recalculate each time the data files are refreshed
+  with clean_data.py</div>
   <p><b class="h">Background</b>Kindergarten MMR coverage of at least 95% is the Healthy People 2030 target{cite(1)}
   and roughly the level needed to stop measles spreading{cite(4)}. U.S. measles cases in 2026 reached their
   highest level since elimination was declared in 2000{cite(2)}, while kindergarten MMR coverage has fallen
   and exemptions have risen{cite(3, 4)}.</p>
   <p><b class="h">Objective</b>To test whether U.S. states with lower kindergarten MMR coverage, or
   higher vaccine exemption rates, had higher measles incidence from {first} to {last}.</p>
-  <p><b class="h">Methods</b>We linked CDC NNDSS provisional measles counts (indigenous plus imported){cite(5)}
-  for the 50 states and DC with CDC SchoolVaxView kindergarten MMR coverage and exemption rates for the
-  matching school year{cite(6)}, and with Census Vintage 2025 population estimates{cite(7)}. That gives
-  51 states × {len(YEARS)} years = {len(table)} state-years. Annual cases were taken from CDC's cumulative
+  <p><b class="h">Methods</b>CDC NNDSS provisional measles counts (indigenous plus imported){cite(5)}
+  for the 50 states and DC were linked with CDC SchoolVaxView kindergarten MMR coverage and exemption rates
+  for the matching school year{cite(6)} and with Census Vintage 2025 population estimates{cite(7)}. That gives
+  51 states × {len(YEARS)} years = {len(table)} state-years. Annual cases were taken from the NNDSS cumulative
   year-to-date counts. The exemption rate counts exemptions from any required vaccine, not MMR alone{cite(1)}.
-  We calculated rates per 100,000 and Spearman rank correlations with permutation p-values, and compared
-  states below 95% coverage with those at or above it.</p>
+  Rates per 100,000 and Spearman rank correlations with permutation p-values were calculated, and states
+  below 95% coverage were compared with those at or above it.</p>
   <p><b class="h">Results</b>Reported cases rose from {tot[first]:,} in {first} ({with_cases[first]} states)
   to {tot[YEARS[1]]:,} in {YEARS[1]} and {tot[last]:,} in {last} through week {LAST_WEEK}
   ({with_cases[last]} states), a {growth:.0f}-fold increase with {last} still incomplete. Median state MMR coverage moved from
-  {sy.loc[sy0, 'mmr_coverage']:.1f}% ({sy0}) to {sy.loc[sy1, 'mmr_coverage']:.1f}% ({sy1}), and the median
-  exemption rate from {sy.loc[sy0, 'exemption_rate']:.1f}% to {sy.loc[sy1, 'exemption_rate']:.1f}%;
+  {f1(sy.loc[sy0, 'mmr_coverage'])}% ({sy0}) to {f1(sy.loc[sy1, 'mmr_coverage'])}% ({sy1}), and the median
+  exemption rate from {f1(sy.loc[sy0, 'exemption_rate'])}% to {f1(sy.loc[sy1, 'exemption_rate'])}%;
   {s_last['n_lo']} of {s_last['n_rep']} reporting states were below 95% in {sy1}.
-  The coverage–incidence association was strongest in {best} (ρ = {stats[best]['rho']:.2f},
-  {fmt_p(stats[best]['p'])}, n = {stats[best]['n']}), when states below 95% had a combined rate
-  {stats[best]['ratio']:.1f}× that of states at or above 95% ({stats[best]['r_lo']:.2f} vs.
-  {stats[best]['r_hi']:.2f} per 100,000). In {last} the association was {strength(s_last['rho'])}
-  (ρ = {s_last['rho']:.2f}, {fmt_p(s_last['p'])}); {", ".join(top3[:-1])} and {top3[-1]} accounted
-  for {top3_share:.0%} of cases. Pooled across years, ρ = {pooled_rho:.2f} ({fmt_p(pooled_p)}, n = {pooled_n} state-years).</p>
-  <p><b class="h">Conclusions</b>States with lower kindergarten MMR coverage tended to have higher measles
-  rates, most clearly in {best}. The relationship is inconsistent from year to year, because a few large,
-  localized outbreaks can dominate state rates, and state averages hide under-vaccinated communities.
-  These are ecological associations and do not show individual-level risk. Even so, the results support
-  closing coverage gaps toward the 95% target{cite(1)}, especially where exemptions are rising.</p>
+  The coverage–incidence association was clear in {len(sig)} of {len(YEARS)} years ({by_year}).
+  It was strongest in {best} (n = {sb['n']}), when states below 95% had a combined rate
+  {sb['ratio']:.1f}× that of states at or above 95% ({sb['r_lo']:.2f} vs. {sb['r_hi']:.2f} per 100,000;
+  median state {sb['m_lo']:.2f} vs. {sb['m_hi']:.2f}). Only {sb['n_rep'] - sb['n_lo']}
+  reporting states were at or above 95%, so these ratios are unstable. In {last} the association was
+  {strength(s_last['rho'])}; {", ".join(top3[:-1])} and {top3[-1]} accounted for {top3_share:.0%} of cases.
+  Pooled across years, ρ = {neg(pooled_rho)} ({fmt_p(pooled_p)}, n = {pooled_n} state-years); this p-value
+  is optimistic because each state appears once per year. {exempt_txt}</p>
+  <p><b class="h">Conclusions</b>{concl} State averages also hide under-vaccinated communities.
+  These are ecological associations and do not show individual-level risk, and a state-level analysis
+  cannot show that raising coverage in a given state would lower its measles rate. The findings are
+  consistent with the Healthy People 2030 goal of 95% kindergarten MMR coverage{cite(1)}.</p>
   <div class="kw"><b>Keywords:</b> measles · MMR vaccination · vaccine exemptions · kindergarten ·
   surveillance · NNDSS · ecological study · United States</div>
 </div>
@@ -711,16 +759,18 @@ with tabs[6]:
          f"{passed_txt}"),
         ("blue", "Vulnerability", f"{s_last['n_lo']} of {s_last['n_rep']}",
          f"States below 95% MMR ({sy1})",
-         f"Median state coverage is {sy.loc[sy1, 'mmr_coverage']:.1f}%. The median exemption rate "
-         f"rose from {sy.loc[sy0, 'exemption_rate']:.1f}% ({sy0}) to {sy.loc[sy1, 'exemption_rate']:.1f}%."),
-        ("red", "Relationship", f"{stats[best]['ratio']:.1f}×",
-         f"Higher rate in below-95% states, {best}",
-         f"Spearman ρ = {stats[best]['rho']:.2f} ({fmt_p(stats[best]['p'])}). Lower coverage went with "
-         f"more measles, most clearly in {best}."),
+         f"Median state coverage is {f1(sy.loc[sy1, 'mmr_coverage'])}%. The median exemption rate "
+         f"rose from {f1(sy.loc[sy0, 'exemption_rate'])}% ({sy0}) to {f1(sy.loc[sy1, 'exemption_rate'])}%."),
+        ("red", "Relationship", f"{len(sig)} of {len(YEARS)}",
+         "Years with a clear coverage link",
+         f"Clearest in {best} (ρ = {neg(sb['rho'])}, {fmt_p(sb['p'])}): states below 95% had "
+         f"{sb['r_lo']:.2f} vs. {sb['r_hi']:.2f} cases per 100k combined, and {sb['m_lo']:.2f} vs. "
+         f"{sb['m_hi']:.2f} for the typical (median) state."
+         + (f" No clear link in {join_years(not_sig, "or")}." if not_sig else "")),
         ("blue", "Clustering", f"{top3_share:.0%}",
          f"Of {last} cases in three states",
          f"{', '.join(top3)}. A few big outbreaks drive the totals, which weakens state-level "
-         f"correlations (ρ = {s_last['rho']:.2f} in {last})."),
+         f"correlations (ρ = {neg(s_last['rho'])} in {last})."),
     ]
     cols = st.columns(4)
     for col, (tone, tag, big, title, body) in zip(cols, cards):

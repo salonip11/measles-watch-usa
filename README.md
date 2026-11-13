@@ -2,11 +2,11 @@
 
 *U.S. Measles Surveillance & Vaccination Vulnerability Dashboard*
 
-[Live Dashboard](https://measles-watch-usa.streamlit.app) <!-- replace with your real link -->
+[Live Dashboard](https://measles-watch-usa.streamlit.app)
 
 An interactive dashboard examining whether state-level gaps in kindergarten MMR coverage and rising vaccine exemptions track with measles incidence across the U.S., 2024 to 2026.
 
-![Dashboard screenshot](screenshot.png) <!-- add a screenshot named screenshot.png -->
+![Dashboard screenshot](screenshot.png)
 
 ## Research question
 Across U.S. states, is lower kindergarten MMR vaccination coverage linked to higher measles incidence?
@@ -29,7 +29,7 @@ Across U.S. states, is lower kindergarten MMR vaccination coverage linked to hig
 |---|---|
 | Weekly measles cases | [CDC National Notifiable Diseases Surveillance System (NNDSS)](https://data.cdc.gov/d/x9gk-5huc), provisional |
 | MMR coverage and exemptions | [CDC SchoolVaxView, kindergarten vaccination coverage and exemptions](https://data.cdc.gov/d/ijqb-a7ye) |
-| State population | [U.S. Census Bureau, Vintage 2025 estimates (NST-EST2025-ALLDATA)](https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html) |
+| State population | [U.S. Census Bureau, Vintage 2025 estimates (NST-EST2025-ALLDATA)](https://www.census.gov/data/datasets/time-series/demo/popest/2020s-state-total.html) |
 
 ## Definitions
 - **MMR coverage**: % of kindergartners up to date with the MMR doses their state requires (usually 2).
@@ -45,12 +45,14 @@ streamlit run app.py      # opens the dashboard
 Already downloaded the CSVs? Put them in `data/raw/` and run `python clean_data.py --raw data/raw`.
 
 ## A note on counting cases
-NNDSS's "Current week" column is frozen when first published, so it never picks up late reports. Adding it up gives 676 measles cases for 2025, against CDC's cumulative year-to-date total of 2,026. This project defines each week's cases as the increase in the cumulative count, so adding up the weeks reproduces CDC's total exactly.
+NNDSS's "Current week" column is frozen when first published, so it never picks up late reports. Adding it up gives 676 measles cases for 2025, against the NNDSS cumulative year-to-date total of 2,026. This project defines each week's cases as the increase in the cumulative count, so adding up the weeks reproduces the NNDSS cumulative total exactly.
+
+NNDSS totals still run below CDC's confirmed counts for completed years (266 vs. 285 for 2024; 2,026 vs. 2,289 for 2025, as reported by Georgetown CCF), because the weekly tables end with the last week of the year and miss later corrections. The dashboard uses NNDSS for every year, so year-to-year comparisons are like with like.
 
 ## Project files
 ```
 measles-watch-usa/
-├── app.py                 # Streamlit dashboard (6 tabs)
+├── app.py                 # Streamlit dashboard (7 tabs)
 ├── clean_data.py          # download, clean, merge
 ├── requirements.txt
 ├── data/
@@ -68,8 +70,8 @@ measles-watch-usa/
 4. Haelle, T. (2026, September 2). *SchoolVaxView offers data and trends on kindergarten vaccination rates*. AHCJ. https://healthjournalism.org/blog/2026/09/schoolvaxview-offers-data-and-trends-on-kindergarten-vaccination-rates
 5. CDC. (2026). *NNDSS weekly data* [Data set]. https://data.cdc.gov/d/x9gk-5huc
 6. CDC. (2026). *Vaccination coverage and exemptions among kindergartners* [Data set]. https://data.cdc.gov/d/ijqb-a7ye
-7. U.S. Census Bureau. (2026). *State population totals and components of change: 2020–2025* (NST-EST2025-ALLDATA) [Data set]. https://www.census.gov/data/tables/time-series/demo/popest/2020s-state-total.html
-8. CDC. (2026, October 16). *Measles cases and outbreaks*. https://www.cdc.gov/measles/data-research/index.html
+7. U.S. Census Bureau. (2026). *State population totals and components of change: 2020–2025* (NST-EST2025-ALLDATA) [Data set]. https://www.census.gov/data/datasets/time-series/demo/popest/2020s-state-total.html
+8. CDC. (2026, October 16). *Measles cases and outbreaks*. Retrieved October 16, 2026. https://www.cdc.gov/measles/data-research/index.html
 
 ## Tools
 Python, pandas, Plotly, Streamlit
