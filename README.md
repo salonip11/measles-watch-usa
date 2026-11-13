@@ -91,6 +91,8 @@ Patil S. Measles Watch USA: U.S. measles surveillance and vaccination vulnerabil
 ## Tools
 Python, pandas, Plotly, Streamlit
 
+Built with AI coding assistance (Claude). Study question, data choices, source verification, and interpretation are my own.
+
 ## Author
 **Saloni Patil, MPH, BDS**  
 MPH in Epidemiology & Biostatistics, Boston University School of Public Health
