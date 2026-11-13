@@ -324,7 +324,7 @@ with tabs[0]:
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Measles cases", f"{total:,}",
-              None if prev is None else f"{total - prev:+,} vs same week {year - 1}",
+              None if prev is None else f"{total - prev:+,} vs {year - 1} wk {min(wk_cmp, 52)}",
               delta_color="inverse")
     c2.metric("States reporting cases", f"{(yr['cases'] > 0).sum()} of 51")
     c3.metric("U.S. rate per 100,000", f"{pooled_rate(yr):.2f}")
@@ -639,7 +639,7 @@ states at or above 95% using the median state rate and the combined rate (all ca
   year, so they compare like with like.
 - *Six states report all-vaccine completion.* Florida, Georgia, Iowa, Mississippi, New Hampshire and New
   Jersey did not assess coverage for individual vaccines; their figure is the share of kindergartners with
-  all required vaccines, which can understate MMR coverage{cite(8)}.
+  all required vaccines, which can understate MMR coverage{cite(6, 8)}.
 - *Exemption measure.* The exemption rate covers any required vaccine, not MMR alone.
 - *One age group.* Kindergarten coverage does not describe older children or adults.
 - *Uneven reporting.* States collect school vaccination data differently, and some skip years.
