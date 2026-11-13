@@ -23,7 +23,7 @@ def r1(x: float) -> str:
     """One decimal place, rounding halves up (4.85 -> 4.9)."""
     return f"{np.floor(x * 10 + 0.5 + 1e-9) / 10:.1f}"
 
-# CDC's confirmed counts for completed years, as reported in reference 3, used only to show how far the
+# CDC's confirmed counts for completed years (reference 8, CDC measles page), used only to show how far the
 # provisional NNDSS totals fall short for completed years.
 CDC_FINAL = {2024: 285, 2025: 2289}
 
@@ -128,32 +128,36 @@ ABBR = {
     "West Virginia": "WV", "Wisconsin": "WI", "Wyoming": "WY",
 }
 
-# ---------------------------------------------------------------- references (APA 7)
+# ---------------------------------------------------------------- references (Vancouver)
 # Numbered in order of first citation in the abstract. cite(1, 2) -> superscript [1,2].
 REFS = [
-    ("Seither, R., Yusuf, O. B., Dramann, D., Calhoun, K., Mugerwa-Kasujja, A., Knighton, C. L., "
-     "Kriss, J. L., Miller, R., &amp; Peacock, G. (2024). Coverage with selected vaccines and exemption "
-     "rates among children in kindergarten — United States, 2023–24 school year. <i>Morbidity and "
-     "Mortality Weekly Report, 73</i>(41), 925–932.", "https://doi.org/10.15585/mmwr.mm7341a3"),
-    ("Willens, V. (2026, July 22). <i>2026 U.S. measles cases surpass 2025 level, highest since declared "
-     "eliminated in 2000</i>. International Vaccine Access Center, Johns Hopkins Bloomberg School of "
-     "Public Health.", "https://publichealth.jhu.edu/ivac/2026-us-measles-cases-surpass-2025-level"),
-    ("Center for Children and Families. (2026, August 25). <i>New CDC data shows increase in vaccine "
-     "exemptions and less vaccine coverage nationally</i>. Georgetown University.",
+    ("Seither R, Yusuf OB, Dramann D, Calhoun K, Mugerwa-Kasujja A, Knighton CL, et al. Coverage with "
+     "selected vaccines and exemption rates among children in kindergarten — United States, 2023–24 school "
+     "year. MMWR Morb Mortal Wkly Rep. 2024 Oct 17;73(41):925–32. doi:10.15585/mmwr.mm7341a3. Available from:",
+     "https://doi.org/10.15585/mmwr.mm7341a3"),
+    ("Willens V. 2026 U.S. measles cases surpass 2025 level, highest since declared eliminated in 2000 "
+     "[Internet]. Baltimore (MD): International Vaccine Access Center, Johns Hopkins Bloomberg School of "
+     "Public Health; 2026 Jul 22 [cited 2026 Nov 13]. Available from:",
+     "https://publichealth.jhu.edu/ivac/2026-us-measles-cases-surpass-2025-level"),
+    ("Green H. New CDC data shows increase in vaccine exemptions and less vaccine coverage nationally "
+     "[Internet]. Washington (DC): Center for Children and Families, Georgetown University McCourt School "
+     "of Public Policy; 2026 Aug 25 [cited 2026 Nov 13]. Available from:",
      "https://ccf.georgetown.edu/2026/08/25/new-cdc-data-shows-increase-in-vaccine-exemptions-and-less-vaccine-coverage-nationally/"),
-    ("Haelle, T. (2026, September 2). <i>SchoolVaxView offers data and trends on kindergarten vaccination "
-     "rates</i>. Association of Health Care Journalists.",
-     "https://healthjournalism.org/blog/2026/09/schoolvaxview-offers-data-and-trends-on-kindergarten-vaccination-rates"),
-    ("Centers for Disease Control and Prevention. (2026). <i>NNDSS weekly data</i> [Data set]. "
-     "Retrieved November 13, 2026.", "https://data.cdc.gov/d/x9gk-5huc"),
-    ("Centers for Disease Control and Prevention. (2026). <i>Vaccination coverage and exemptions among "
-     "kindergartners</i> [Data set]. SchoolVaxView. Retrieved November 13, 2026.",
-     "https://data.cdc.gov/d/ijqb-a7ye"),
-    ("U.S. Census Bureau. (2026). <i>State population totals and components of change: 2020–2025</i> "
-     "(Vintage 2025, NST-EST2025-ALLDATA) [Data set].",
+    ("Haelle T. SchoolVaxView offers data and trends on kindergarten vaccination rates [Internet]. "
+     "Association of Health Care Journalists; 2026 Sep 2 [cited 2026 Nov 13]. Available from:",
+     "https://healthjournalism.org/blog/2026/09/schoolvaxview-offers-data-and-trends-on-kindergarten-vaccination-rates/"),
+    ("Centers for Disease Control and Prevention. NNDSS weekly data [Internet]. Atlanta (GA): CDC; 2026 "
+     "[updated 2026 Nov 11; cited 2026 Nov 13]. Available from:",
+     "https://data.cdc.gov/NNDSS/NNDSS-Weekly-Data/x9gk-5huc"),
+    ("Centers for Disease Control and Prevention. Vaccination coverage and exemptions among kindergartners "
+     "[Internet]. Atlanta (GA): CDC; 2026 [updated 2026 Sep 9; cited 2026 Nov 13]. Available from:",
+     "https://data.cdc.gov/Vaccinations/Vaccination-Coverage-and-Exemptions-among-Kinderga/ijqb-a7ye"),
+    ("U.S. Census Bureau. State population totals and components of change: 2020–2025 (Vintage 2025, "
+     "NST-EST2025-ALLDATA) [Internet]. Washington (DC): U.S. Census Bureau; 2026 Jan [cited 2026 Nov 13]. "
+     "Available from:",
      "https://www.census.gov/data/datasets/time-series/demo/popest/2020s-state-total.html"),
-    ("Centers for Disease Control and Prevention. (2026, October 16). <i>Measles cases and outbreaks</i>. "
-     "Retrieved October 16, 2026.",
+    ("Centers for Disease Control and Prevention. Measles cases and outbreaks [Internet]. Atlanta (GA): "
+     "CDC; 2026 [updated 2026 Nov 13; cited 2026 Nov 13]. Available from:",
      "https://www.cdc.gov/measles/data-research/index.html"),
 ]
 
@@ -628,11 +632,14 @@ states at or above 95% using the median state rate and the combined rate (all ca
 - *Association, not cause.* Travel, outbreak timing and local factors also affect where measles appears.
 - *Outbreaks are clumpy.* One large outbreak can dominate a whole state's rate.
 - *Provisional counts.* NNDSS figures are revised over time and can differ from CDC's measles page,
-  which is compiled separately. For example, CDC's page reported 4,410 confirmed 2026 cases as of
-  October 15, 2026, including 18 among international visitors{cite(8)}. NNDSS totals also run below
-  CDC's confirmed counts for completed years ({final_gap}){cite(3)}, because the weekly tables end with the
+  which is compiled separately. For example, CDC's page reported 5,412 confirmed 2026 cases as of
+  November 12, 2026, including 18 among international visitors{cite(8)}. NNDSS totals also run below
+  CDC's confirmed counts for completed years ({final_gap}){cite(8)}, because the weekly tables end with the
   last week of the year and miss later corrections. All year-to-year comparisons here use NNDSS for every
   year, so they compare like with like.
+- *Six states report all-vaccine completion.* Florida, Georgia, Iowa, Mississippi, New Hampshire and New
+  Jersey did not assess coverage for individual vaccines; their figure is the share of kindergartners with
+  all required vaccines, which can understate MMR coverage{cite(8)}.
 - *Exemption measure.* The exemption rate covers any required vaccine, not MMR alone.
 - *One age group.* Kindergarten coverage does not describe older children or adults.
 - *Uneven reporting.* States collect school vaccination data differently, and some skip years.
@@ -801,9 +808,9 @@ with tabs[6]:
          "SchoolVaxView offers data and trends on kindergarten vaccination rates",
          "A reporter's guide to CDC's school vaccination data. Exemptions from at least one vaccine rose 17% in 2025-26.",
          "https://healthjournalism.org/blog/2026/09/schoolvaxview-offers-data-and-trends-on-kindergarten-vaccination-rates"),
-        ("CDC [8]", "Updated Oct 16, 2026",
+        ("CDC [8]", "Updated Nov 13, 2026",
          "Measles cases and outbreaks",
-         "CDC's official confirmed-case count (4,410 in 2026 as of Oct 15), plus outbreaks, ages and vaccination status.",
+         "CDC's official confirmed-case count (5,412 in 2026 as of Nov 12), plus outbreaks, ages and vaccination status.",
          "https://www.cdc.gov/measles/data-research/index.html"),
     ]
     cols = st.columns(4)
@@ -815,8 +822,8 @@ with tabs[6]:
     st.caption("National totals in news reports come from CDC's measles page and can differ from "
                "the provisional NNDSS counts used in this dashboard. See Methods.")
     st.markdown(references_html() +
-                f'<div class="howcite"><b>How to cite this dashboard:</b> Patil, S. ({LAST_DATE:%Y}). '
-                f'<i>Measles Watch USA: U.S. measles surveillance and vaccination vulnerability dashboard</i> '
-                f'[Interactive dashboard]. Data through {LAST_DATE:%B %d, %Y}. '
-                f'<a href="https://salonipatil.com/research" target="_blank">salonipatil.com/research</a></div>'
+                f'<div class="howcite"><b>How to cite this dashboard:</b> Patil S. Measles Watch USA: U.S. measles '
+                f'surveillance and vaccination vulnerability dashboard [Internet]. {LAST_DATE:%Y} '
+                f'[data through {LAST_DATE:%Y %b %d}]. Available from: '
+                f'<a href="https://measles-watch-usa.streamlit.app" target="_blank">https://measles-watch-usa.streamlit.app</a></div>'
                 + author_html(), unsafe_allow_html=True)
